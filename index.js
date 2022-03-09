@@ -1,0 +1,533 @@
+const { Client, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
+
+  if (interaction.commandName === 'ping') {
+    await interaction.reply('Pong!');
+  }
+});
+
+client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
+
+const { deepStrictEqual } = require('assert');
+const { constants } = require('buffer');
+const Discord = require('discord.js');
+const fs = require('fs');
+const { getgid } = require('process');
+const { fileURLToPath } = require('url');
+//const client = new Discord.Client();
+const https = require('https');
+const querystring = require('querystring');
+const { time } = require('console');
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+function getDictionary(input, callback) {
+  let resp = [];
+  var params = {
+    query: input, 
+    m: 'pc', 
+    hid: '162226050205664350'
+  };
+
+  var naverDictionaryInfo = {
+    hostname: 'ko.dict.naver.com',
+    port: 443,
+    path: '/api3/koko/search?' + querystring.stringify(params),
+    // path: '/api3/koko/search?query=%EC%B9%98%EA%B3%BC&m=pc&hid=162226050205664350',
+    method: 'GET', 
+    // json: true
+  };
+  
+  var req = https.request(naverDictionaryInfo, (res) => {
+    let body = "";
+    console.log('statusCode:', res.statusCode);
+  
+    res.on('data', (d) => {
+      // process.stdout.write(d);
+      body += d;
+    }).on('end', () => {
+      try {
+        let jsonResp = JSON.parse(body);
+        resp['partOfSpeech'] = jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['partOfSpeech'];
+        resp['value'] = JSON.stringify(jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['means'][0]['value']);
+        console.log('in the function value : ' + resp['value']);
+        callback(resp);
+        
+        // console.log('jsonRespxx : ' + JSON.stringify(jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['means'][0]['value']));
+        // if(jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['partOfSpeech'] === "명사"){
+        // return jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['means'][0]['value']
+        //console.log('jsonResp : ' + jsonResp['searchResultMap']['searchResultListMap']['WORD']['items'][0]['meansCollector'][0]['means']['value']);
+        return resp;
+        
+      } catch (error) {
+        console.error(error.message);
+      };
+    });
+  });
+  
+  req.on('error', (e) => {
+    console.error(e);
+  });
+  
+  req.end();
+}
+
+
+client.on('ready', () => {
+  console.log("봇 온!");
+});
+const questionmap = new Map();
+const rmap = new Map();
+const pointmap = new Map();
+const memomap = new Map();
+const ggutmalitguimap = new Map();
+const lenggutmalitguimap = new Map();
+const usermap = new Map();
+const moonjaemap = new Map();
+const answermap = new Map();
+const answered = new Map();
+client.on('message', msg => {
+
+
+if(!(msg.author.username === "돈돌")){
+
+  if (msg.content === '우돌') {
+    msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
+  }
+  if (msg.content === '쿨냥') {
+    msg.reply('쿨냥이는 2010년 2월 18일에 태어났으며 우돌이랑 같이 게임하는 매우 우돌이 유튜브에 도움을 주는 사람입니다');
+  }
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  if(msg.content === "가위" || msg.content === "바위" || msg.content === "보") {
+    const human = msg.content;
+    const list = ["가위", "바위", "보"];
+    const random = Math.floor(Math.random() * 3);
+    const bot = list[random]
+   
+    let winner = "";
+    if(human === bot) {
+      winner = "비김";
+    }
+    else{
+      human === "가위"? (winner = bot === "바위" ? "봇" : "인간") : "";
+      human === "바위"? (winner = bot === "보" ? "봇" : "인간") : "";
+      human === "보"? (winner = bot === "가위" ? "봇" : "인간") : "";
+    }
+    const result = 
+`
+사람 : ${human} vs 봇 : ${bot}
+${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
+`
+    msg.reply(result);
+    
+  
+  }
+
+
+
+
+  if(msg.content === "^우돌봇"){
+    const embed = new Discord.MessageEmbed()
+    .setAuthor("우돌봇", "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
+    .setTitle("우돌봇 프로필")
+    .setURL("https://www.youtube.com/channel/UC0tqXa-9l_CHd3ipnNE0jeQ")
+    .setColor(0x98F791)
+    .setDescription("안녕하세요 우돌봇입니다")
+    .setThumbnail("https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
+    .addField("취미", "대답하기", true)
+    .addField("제작자", "우돌우돌#2268", true)
+    .addField("^우돌봇", "우돌봇 프로필을 봅니다", true)
+    .addField("이 봇에게 메시지를 지울 권한을 주세요.", "제작자에게 계속 에러가 갈 수 있습니다", true)
+    .addField("가위 또는 바위 또는 보", "봇과 가위바위보를 합니다", true)
+    .addField('-shout "하고 싶은 말"', '모두에게 원하는 메시지를 보냅니다', true)
+    .addField("우돌", "우돌이에 대한 정보를 봅니다", true)
+    .addField("무한", "무야호", true)
+    .addField("쿨냥", "쿨냥이의 정보를 봅니다", true)
+    .addField("오른쪽 또는 왼쪽", "봇과 참참참을 합니다", true)
+    .addField("초대 우돌봇", "우돌봇 초대 링크를 받습니다.", true)
+    .addField("시계", "시간을 봅니다", true)
+    .addField("뭐먹지", "음식을 추천합니다", true)
+    .addField("우돌봇 날씨", "날씨를 보여줍니다", true)
+    .addField("ㄱㄱㄷ ㄱㄱ", "구구단 문제를 냅니다.", true)
+    .addField("ㄹㅅㅁㄱ", "랜덤 수학 문제를 냅니다", true)
+    .addField("%하픽 {닉네임}", "그 닉네임을 가진 사람의 하이픽셀 정보를 봅니다.", true)
+    .addField("%스블 {닉네임}", "그 닉네임을 가진 사람의 스카이블럭 정보를 봅니다.", true)
+    .addField("<>{끝말잇기를 진행할 단어}", "끝말잇기를 진행할 수 있습니다. 만약 먹히지 않는다면 DM으로 말씀해 주세요", true)
+    .addField("%청소 {숫자}", "숫자에 들어간 숫자만큼 메시지를 청소합니다.", true)
+    .addField("밸게 ㄱ", "밸런스 게임을 합니다")
+    .addField("파이 = ??", "파이값 을 보여 줍니다.",true)
+    .setTimestamp(new Date())
+    msg.channel.send(embed)
+
+  }
+
+
+
+  if (msg.content === '무한') {
+    msg.reply('무야호~');
+  }
+  
+  if (msg.content === '제작자') {
+    msg.reply('https://discord.gg/kGE8wxP2Nq 에서 제작자를 만나보세요!');
+  }
+  
+    
+    if(msg.content.startsWith('-shout')){
+      const str1 = msg.content;
+      msg.reply(str1.substring(6))
+
+
+    };
+    if (msg.content === ('뭐먹지')){
+      const eatlist = ['떡볶이', "계란말이", '라면', "부대찌개", '생선구이', "소고기", '돼지고기 볶음', "치킨"]; 
+      const random1 = Math.floor(Math.random() * 8);
+      const eatresult = eatlist[random1];
+      msg.reply(eatresult);
+    }
+    if(msg.content === "오른쪽" || msg.content === "왼쪽"){
+      const humancham = msg.content;
+      const chamlist = ["오른쪽", "왼쪽"];
+      const random2 = Math.floor(Math.random() * 2);
+      const botcham = chamlist[random2];
+      let chamwinner = "";
+      if (humancham === botcham){
+        chamwinner = "봇";
+      }
+      else{
+
+        chamwinner = "인간"
+
+      }
+      const chamresult = 
+      `
+      사람 : ${humancham} vs 봇 : ${botcham}
+      ${chamwinner === "봇" ? "내가 이겼다 휴먼" : chamwinner + "의 승리다"}
+      `
+          msg.reply(chamresult);
+      
+      }
+
+    
+    if(msg.content === "시계"){
+      const embed2 = new Discord.MessageEmbed()
+      .setTitle("시계")
+      .setTimestamp(new Date())
+      msg.channel.send(embed2)
+    }
+
+    if(msg.content === "구독"){
+      console.log(msg.author)
+
+
+    }
+      if(msg.content === "초대 우돌봇"){
+        msg.reply("우돌봇 초대 코드 : https://discord.com/api/oauth2/authorize?client_id=827773417016524850&permissions=3490314486&scope=bot")
+      
+
+      }
+      if(msg.content === "우돌봇 날씨"){
+        msg.reply("웹에서 쿠키 가져오는 중...")
+        msg.reply("완료!")
+        msg.reply("weather.com에서 날씨 정보 가져오는 중...")
+        msg.reply("완료!")
+        msg.reply("처리 중...")
+        msg.reply("완료!")
+        msg.reply("현재 비가 올 확률은 W%입니다! (단, W는 0보다 크고 100보다 작습니다.")
+      }
+      if(msg.content === "rw"){
+        msg.reply("https://www.weather.com")
+      }
+      if(msg.content === "우돌봇 구구단"){
+        const n1 = Math.floor(Math.random() * 9);
+        const n2 = Math.floor(Math.random() * 9);
+        msg.reply(n1 + " x " + n2)
+        msg.reply("= ?")
+        msg.reply("정답을 입력하기 전에 &을 적어주세요. EX : &32, &81")
+          
+          
+        
+
+        questionmap.set(msg.author, n1 * n2)
+        
+      }
+    
+        if(msg.content.startsWith("&")){
+        console.log("놈ㅇ내ㅑ")
+        const playermessage = msg.content
+        const playerresult = playermessage.substring(1)
+        console.log(playerresult)
+        const playermessageresult = Number(playerresult)
+          if(playermessageresult === questionmap.get(msg.author)){
+          msg.reply("정답입니다!")
+
+        }
+        else{
+          msg.reply("틀렸습니다!")
+      }
+      
+        } 
+        if(msg.content === "ㄹㅅㅁㄱ"){ //랜덤 수학 문제 ㄱㄱ
+          const xpmd = [" * ", " / ", " + ", " - "]
+          const rn1 = Math.floor(Math.random() * 99);
+          const rn2 = Math.floor(Math.random() * 99);
+          const rindex = Math.floor(Math.random() * 3)
+          if(rindex === 0){
+            msg.reply(rn1 + " X " + rn2)
+            msg.reply("= ? ")
+            msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
+            rmap.set(msg.author, rn1 * rn2)
+          }
+            console.log(rn1 * rn2)
+          if(rindex === 1){
+            msg.reply(rn1 + " / " + rn2)
+            msg.reply("= ? ")
+            msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
+            msg.reply("소수점으로 내려갈 가능성이 다수이니 1의 자리로 버림해 주세요")
+            rmap.set(msg.author, parseInt(rn1 / rn2))
+          }
+            console.log(parseInt(rn1 / rn2))
+          if(rindex === 2){
+            msg.reply(rn1 + " + " + rn2)
+            msg.reply("= ? ")
+            msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
+            rmap.set(msg.author, rn1 + rn2)
+          }
+            console.log(rn1 + rn2)
+          if(rindex === 3){
+            msg.reply(rn1 + " - " + rn2)
+            msg.reply("= ? ")
+            msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
+            rmap.set(msg.author, rn1 - rn2)
+            console.log(rn1 - rn2)
+          }
+       
+            }
+            if(msg.content.startsWith("#")){
+              console.log("놈ㅇ내ㅑ")
+              const rplayermessage = msg.content
+              const rplayerresult = rplayermessage.substring(1)
+              console.log(rplayerresult)
+              const rplayermessageresult = Number(rplayerresult)
+                if(rplayermessageresult === rmap.get(msg.author)){
+                msg.reply("정답입니다!")  
+              } 
+              else{
+                msg.reply("틀렸습니다!")
+              }
+              }
+              if(msg.content.startsWith("%하픽 ")){
+                const playernickname = msg.content.substring(4);
+                msg.channel.send("https://plancke.io/hypixel/player/stats/" + playernickname)
+              }  
+              if(msg.content.startsWith("%스블 ")){
+                const playerskyblock = msg.content.substring(4)
+                msg.channel.send("https://sky.lea.moe/stats/" + playerskyblock)
+              }
+              if(msg.content.startsWith("%길드 ")){
+                const playernickname = msg.content.substring(4);
+                msg.channel.send("https://plancke.io/hypixel/guild/player/" + playernickname)
+              }
+              if(msg.content.startsWith("메모 써 ")){
+                memothing = msg.content.substring(5);
+                
+                memomap.set(msg.author, memothing);
+                msg.reply(memothing + " 를 메모에 저장했습니다!") 
+                console.log(memomap)
+              }
+              if(msg.content === "메모 보여줘"){
+                msg.reply(memomap.get(msg.author))
+              }
+              if(msg.content === "메모 삭제"){
+                memomap.delete(msg.author)
+                msg.reply("메모를 지웠습니다!")
+              }
+              if(msg.content.startsWith("우")){
+                console.log(msg.author)
+              }
+              if(msg.content.startsWith(".a")){
+                msg.channel.bulkDelete(1)
+                const embed2 = new Discord.MessageEmbed()
+                .setAuthor(msg.author.username, "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
+                .setTitle(msg.content.substring(3))
+                .setColor(0x98F791)
+                .setDescription("")
+                
+                
+                msg.channel.send(embed2)
+            
+              }
+              if(msg.content.startsWith("<>")){
+                const playerggutmalitgui = msg.content.substring(2) //유저가 적은 말을 저장
+                const lastggutmalitgui = ggutmalitguimap.get(msg.channel.id) //원래 저장되어 있는 단어를 가져오기
+                const playerggutlen = playerggutmalitgui.length - 1 //원래 저장되어 있는 단어의 길이를 가져오기
+              if(playerggutmalitgui.length >= 0){
+              if(playerggutmalitgui[0] === lastggutmalitgui[playerggutlen]){ 
+                if(playerggutlen > 0){
+                /*유저가 적은 말의 첫번째 글자가 저장되어 있던 단어의 맨
+                마지막 글자와 같다면 
+                */
+                console.log(playerggutmalitgui) //이 단어를 콘솔에 띄우기
+                
+                getDictionary(playerggutmalitgui, function(resp) {
+                  console.log("resp[value] : " + resp['value']);
+                  ggutmalitguimap.set(msg.channel.id, playerggutmalitgui) //저장하기
+                  lenggutmalitguimap.set(msg.channel.id, playerggutlen) //단어 길이 저장하기
+                  const ggutembed = new Discord.MessageEmbed()
+                    .setAuthor(msg.author.username, "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
+                    .setTitle(playerggutmalitgui)
+                    .setDescription("우돌봇은 네이버 사전을 이용하고 있어요!")
+                    .addField("뜻", resp['value'])
+                    .setColor(0x98F791)
+                    .setTimestamp(new Date())
+                  console.log(ggutmalitguimap)
+                  msg.channel.bulkDelete(1)
+                  msg.reply(ggutembed)
+                  console.log(msg.content.id)
+                  
+                  } 
+                );
+            
+                
+               
+               
+            }
+          }
+            else{
+              msg.channel.bulkDelete(1)
+              msg.channel.send("글자 수가 2글자 이상이 되게 또는 첫 글자가 전 단어의 제일 뒷 자리의 글자와 같게 해 주세요!")
+              
+            }       
+              }
+
+              
+            }
+            if(msg.content.includes === ""){
+              console.log(String(msg.channel.id));
+              console.log(String(msg.author.username));
+            }
+            if(msg.content === "파이 = ??"){
+              msg.channel.send("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 70679 82148 08651 32823 06647 09384 46095 50582 23172 53594 08128 48111 74502 84102 70193 85211 05559 64462 29489 54930 38196 44288 10975 66593 34461 28475 64823 37867 83165 27120 19091 45648 56692 34603 48610 45432 66482 13393 60726 02491 41273 72458 70066 06315 58817 48815 20920 96282 92540 91715 36436 78925 90360 01133 05305 48820 46652 13841 46951 94151 16094 33057 27036 57595 91953 09218 61173 81932 61179 31051 18548 07446 23799 62749 56735 18857 52724 89122 79381 83011 94912 98336 73362 44065 66430 86021 39494 63952 24737 19070 21798 60943 70277 05392 17176 29317 67523 84674 81846 76694 05132 00056 81271 45263 56082 77857 71342 75778 96091 73637 17872 14684 40901 22495 34301 46549 58537 10507 92279 68925 89235 42019 95611 21290 21960 86403 44181 59813 62977 47713 09960 51870 72113 49999 99837 29780 49951 05973 17328 16096 31859 50244 59455 34690 83026 42522 30825 33446 85035 26193 11881 71010 00313 78387 52886 58753 32083 81420 61717 76691 47303 59825 34904 28755 46873 11595 62863 88235 37875 93751 95778 18577 80532 17122 68066 13001 92787 66111 95909 21642 01989 38095 25720 10654 85863 27886 59361 53381 82796 82303 01952 03530 18529 68995 77362 25994 13891 24972 17752 83479 13151 55748 57242 45415 06959 50829 53311 68617 27855 88907 50983 81754 63746 49393 19255 06040 09277 01671 13900 98488 24012 85836 16035 63707 66010 47101 81942 95559 61989 46767 83744 94482 55379 77472 68471 04047 53464 62080 46684 25906 94912 93313 67702 89891 52104 75216 20569 66024 05803 81501 93511 25338 24300 35587 64024 74964 73263 91419 92726 04269 92279 67823 54781 63600 93417 21641 21992 45863 15030 28618 29745 55706 74983 85054 94588 58692 69956 90927 21079 75093 02955 32116 53449 87202 75596 02364 80665 49911 98818 34797 75356 63698 07426 54252 78625 51818 41757 46728 90977 77279 38000 81647 06001 61452 49192 17321 72147 72350")
+            }
+            if(msg.content.startsWith("끝말잇기 리셋 ")){
+              ggutmalitguimap.set(msg.channel.id, msg.content.substring(8))
+              lenggutmalitguimap.set(msg.channel.id, 1)
+              console.log(ggutmalitguimap)
+              msg.channel.bulkDelete(1)
+              const resetembed = new Discord.MessageEmbed()
+              .setAuthor("끝말잇기 초기화!")
+              .setTitle(ggutmalitguimap.get(msg.channel.id
+                ))
+              .setDescription("로 초기화 되었습니다!")
+              .setColor(0x98F791)
+              msg.channel.send(resetembed)
+              msg.channel.send("https://tenor.com/view/matrix-agent-bulletproof-speed-gif-7432265")
+              msg.channel.send("푸헤헤헤 최첨단 리셋술!")
+            }
+           if(msg.content.includes("@everyone")){
+           console.log(msg.author.username) 
+           msg.channel.bulkDelete(1)
+           }
+           if(msg.content.startsWith("%청소 ")){
+            const chungsoinput = msg.content.substring(4)
+            console.log(msg.author.username)
+            msg.channel.bulkDelete(chungsoinput)
+           
+           
+          }
+          if(msg.content.startsWith("♪공지 ")){
+            const messagegongji = msg.content.substring(4)
+            const countlist = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+            
+            msg.channel.bulkDelete(1)
+            for(count in countlist){
+              msg.channel.send(count + "번째 반복한다. " + messagegongji)              
+            }
+          
+          }
+          if(msg.content === "밸게 ㄱ"){
+            
+            if(usermap.get(msg.author.username === "")){
+              msg.reply("[밸게 ㄱ] 를 입력하여 밸런스 게임을 진행하고 해 주세요!")
+            }
+            const randombalancegamelist = ["키 커지기vs근육 생기기", "(학교 강당에서 마이크 잡고) 소리지르기vs반야심경 읽기", "위인전에 있는 나vs대통령 자리에 있는 나", "(클럽에서 신나는 음악 틀었을때) 관종같이 춤추기vs무표정으로 가만히 서있기", "돈없는 커플vs돈 많은 모솔", "스프없이 라면먹고 10만원 받기vs스프넣은 라면먹고 10만원 내기", "회사 사장vs1000만 유튜버", "거지랑 뽀뽀하기vs강도랑 뽀뽀하기", "지루한 1시간 비행기타기 vs신나는 20시간 비행기타기", "자판기 털기vs사람많은 이마트에서 외국돈으로 계산하기", "평생 청각장애인으로 살기vs평생 이어폰만 끼기", "(군대18개월동안)조교로 일하기vsPX병으로 일하기", "화만 내면서 살기 vs 어떤일을 받든 웃으면서 살기", "바다 vs 산", "돈 vs 친구", "공부 vs 게임", "음식 vs 옷", "에어컨 없는 여름vs난방 없는 겨울", "머리카락 없는 남,여친vs머릿속이 빈 남,여친", "손가락 4개vs손가락 6개","3분에 1만원 버는 메뚜기 유재석 vs 이자 죽을 때까지 못 갚는 토니 스타크", "매일 3안타는 치는 유민상 vs 1땅볼도 못하는 박병호"]
+            const randomindex = Math.floor(Math.random() * randombalancegamelist.length);
+            msg.channel.send(randombalancegamelist[randomindex])
+            msg.channel.send("왼 또는 오른 로 대답하여 주세요")
+            usermap.set(msg.author.username, "true")
+            moonjaemap.set(msg.author.username, randomindex)
+            answered.set(msg.author.username, "false")
+          }
+          if(msg.content === "왼"){
+            if(usermap.get(msg.author.username) === ""){
+              msg.reply("[밸게 ㄱ] 를 입력하여 밸런스 게임을 진행하고 해 주세요!")
+            }
+            if(usermap.get(msg.author.username) === "true"){
+              msg.reply("그렇군요! ...메모메모... 왼쪽이라고 한다...")
+              usermap.set(msg.author.username, "")
+              answermap.set(msg.author.username, "왼쪽")
+              answered.set(msg.author.username, "true")
+              msg.channel.send("[밸게기] 를 입력하여 기록을 보세요!")
+            }
+          }
+          if(msg.content === "오른"){
+            if(usermap.get(msg.author.username) === ""){
+              msg.reply("[밸게 ㄱ]를 입력하여 밸런스 게임을 진행하고 해 주세요!")
+            }
+            if(usermap.get(msg.author.username) === "true"){
+              msg.reply("그렇군요! ...메모메모... 오른쪽이라고 한다...")
+              usermap.set(msg.author.username, "")
+              answermap.set(msg.author.username, "오른쪽")
+              answered.set(msg.author.username, "true")
+              msg.channel.send("[밸게기] 를 입력하여 기록을 보세요!")
+            }
+
+          }
+          if(msg.content === "밸게기"){
+            if(answered.get(msg.author.username) === "false"){
+              msg.reply("질문에 답을 하고 해 주세요!")
+            }
+            if(answered.get(msg.author.username) === "true"){
+              
+              const randombalancegamelist = ["키 커지기vs근육 생기기", "(학교 강당에서 마이크 잡고) 소리지르기vs반야심경 읽기", "위인전에 있는 나vs대통령 자리에 있는 나", "(클럽에서 신나는 음악 틀었을때) 관종같이 춤추기vs무표정으로 가만히 서있기", "돈없는 커플vs돈 많은 모솔", "스프없이 라면먹고 10만원 받기vs스프넣은 라면먹고 10만원 내기", "회사 사장vs1000만 유튜버", "거지랑 뽀뽀하기vs강도랑 뽀뽀하기", "지루한 1시간 비행기타기 vs신나는 20시간 비행기타기", "자판기 털기vs사람많은 이마트에서 외국돈으로 계산하기", "평생 청각장애인으로 살기vs평생 이어폰만 끼기", "(군대18개월동안)조교로 일하기vsPX병으로 일하기", "화만 내면서 살기 vs 어떤일을 받든 웃으면서 살기", "바다 vs 산", "돈 vs 친구", "공부 vs 게임", "음식 vs 옷", "에어컨 없는 여름vs난방 없는 겨울", "머리카락 없는 남,여친vs머릿속이 빈 남,여친", "손가락 4개vs손가락 6개","3분에 1만원 버는 메뚜기 유재석 vs 이자 죽을 때까지 못 갚는 토니 스타크", "매일 3안타는 치는 유민상 vs 1땅볼도 못하는 박병호", "날아다니는 대신 돈 못 벌기 vs 못 걷지만 초당 10만원"]
+              const moonjae = "바로 전 문제는 " + randombalancegamelist[moonjaemap.get(msg.author.username)] + " 이었습니다."
+              const resultt = "당신의 대답은 [" + answermap.get(msg.author.username) + "]"
+              const balanceembed = new Discord.MessageEmbed()
+            
+                .setAuthor(msg.author.username, "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
+                .setTitle(moonjae)
+                .addField(resultt, "을(를) 골랐습니다!")
+                .setTimestamp(new Date())
+                .setColor(0x98F791)
+              msg.channel.send(balanceembed)
+            }
+            
+          }
+          if(msg.content=="세홍_바보"){
+              msg.channel.send("세홍")
+            
+          }
+
+
+
+      }
+      } 
+      
+           
+      
+    )
+client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
+
