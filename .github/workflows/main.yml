@@ -38,7 +38,7 @@ jobs:
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
         with:
-          switches: -avzr --delete
+          switches: -avzr --exclude 'node_modules' --delete
           path: ./*
           remote_path: /home/ubuntu/bot/
           remote_host: ec2-52-79-250-133.ap-northeast-2.compute.amazonaws.com
