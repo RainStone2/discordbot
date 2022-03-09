@@ -41,6 +41,6 @@ jobs:
           switches: -avzr --delete
           path: ./*
           remote_path: /home/ubuntu/bot/
-          remote_host: northeast-2c	ec2-52-79-250-133.ap-northeast-2.compute.amazonaws.com
+          remote_host: ec2-52-79-250-133.ap-northeast-2.compute.amazonaws.com
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
