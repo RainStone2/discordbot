@@ -25,7 +25,7 @@ const https = require('https');
 const querystring = require('querystring');
 const { time } = require('console');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-
+const { MessageEmbed } = require('discord.js');
 function getDictionary(input, callback) {
   let resp = [];
   var params = {
@@ -91,10 +91,20 @@ const usermap = new Map();
 const moonjaemap = new Map();
 const answermap = new Map();
 const answered = new Map();
+const moneymap = new Map();
+const accountCreated = new Map();
+const percentmap = new Map();
+const earningmap = new Map();
 client.on('message', msg => {
+  if(accountCreated.get(msg.author) != true){
+    moneymap.set(msg.author, 0)
+    percentmap.set(msg.author, 1)
+    accountCreated.set(msg.author, true)
+    earningmap.set(msg.author, 1)
+    percentmap.set(msg.author, 1)
+  }
 
 
-if(!(msg.author.username === "돈돌")){
 
   if (msg.content === '우돌') {
     msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
@@ -170,12 +180,89 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("%청소 {숫자}", "숫자에 들어간 숫자만큼 메시지를 청소합니다.", true)
     .addField("밸게 ㄱ", "밸런스 게임을 합니다")
     .addField("파이 = ??", "파이값 을 보여 줍니다.",true)
+    .addField("!돈", "돈 관련 게임의 도움말을 보여 줍니다.")
     .setTimestamp(new Date())
     msg.channel.send(embed)
 
   }
 
+  if(msg.content == "!돈"){
+    const moneyEmbed = new MessageEmbed()
+      .setColor('#0099ff')
+      .setTitle("돈벌기 게임의 명령어입니다.")  
+      .addField(".g", "돈을 법니다.")
+      .addField(".s", "보유재산을 봅니다.")
+      .addField(".%", "확률표를 봅니다.")
+      .addField(".b 1", "한번에 얻는 돈의 양을 늘려 줍니다.")
+      .addField(".b 2", "좋은 물건을 얻을 가능성이 높아집니다.")
+    msg.channel.send(moneyEmbed);
 
+}
+    if(msg.content == ".g"){
+      const randomint = Math.floor(Math.random()*1000)
+      if(randomint <= 1000){
+        var prefix = "동전"
+        var multiple = 1
+          if(randomint <= 200 + (20 * percentmap.get(msg.author))){
+            var prefix = "금"
+            var multiple = 10
+            if(randomint <= 50 + (10 * percentmap.get(msg.author))){
+              var prefix = "다이아몬드"
+              var multiple = 500
+              if(randomint <= 10 + (10 * percentmap.get(msg.author))){
+                var prefix = "에메랄드"
+                var multiple = 5000
+                  if(randomint <= 5 + (5 * percentmap.get(msg.author))){
+                    var prefix = "운석"
+                    var multiple = 10000
+      }}}}}
+      msg.channel.send(prefix + " 을(를) 발견했습니다!" + earningmap.get(msg.author) * Number(multiple) + "원을 벌었습니다!")
+      lastmoney = Number(moneymap.get(msg.author));
+      moneymap.set(msg.author, lastmoney += 1 * Number(multiple));
+      console.log(moneymap.get(msg.author))
+      
+    }
+    if(msg.content == ".s"){
+      console.log(Number(moneymap.get(msg.author)))
+      if(moneymap.get(msg.author) >= 1){
+        msg.channel.send("당신에게는 " + Number(moneymap.get(msg.author)) + "원이 있습니다!");
+      }
+      else{
+        msg.channel.send("당신에게는 돈이 없습니다!");
+      }
+    }
+      if(msg.content == ".b 1"){
+        if(moneymap.get(msg.author) >= 1000 * earningmap.get(msg.author)){
+          earning = Number(earningmap.get(msg.author))
+          earningmap.set(msg.author, earning + 1)
+          msg.channel.send("한번에 얻는 돈의 양이 많아졌다!")
+        }
+        else if(moneymap.get(msg.author) < 1000 * earningmap.get(msg.author)){
+          msg.channel.send("돈이 부족합니다.")
+        }
+          
+        }
+        
+        if(msg.content == ".b 2"){
+          if(moneymap.get(msg.author) >= 1000 * percentmap.get(msg.author)){
+            percent = Number(percentmap.get(msg.author))
+            percentmap.set(msg.author, percent + 1)
+            msg.channel.send("좋은 아이템을 발견할 확률이 늘어났다!")
+          }
+          else if(moneymap.get(msg.author) < 1000 * percentmap.get(msg.author)){
+            msg.channel.send("돈이 부족합니다.")
+          }
+      }
+      if(msg.content == ".%"){
+        percentembed = new MessageEmbed()
+          .setTitle(msg.author.username + "의 확률표")
+          .addField("동전 확률", String(100 - ((20 + 5 + 1 + 0.5) + 4.5 * percentmap.get(msg.author))) + "%")
+          .addField("금 확률", String(20 + (2 * percentmap.get(msg.author))) + "%")
+          .addField("다이아몬드 확률", String(5 + (1 * percentmap.get(msg.author))) + "%")
+          .addField("에메랄드 확률", String(1 + (1 * percentmap.get(msg.author))) + "%")
+          .addField("운석 확률", String(0.5 + (0.5 * percentmap.get(msg.author))) + "%")
+        msg.channel.send(percentembed);
+        }
 
   if (msg.content === '무한') {
     msg.reply('무야호~');
@@ -266,7 +353,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       }
     
         if(msg.content.startsWith("&")){
-        console.log("놈ㅇ내ㅑ")
         const playermessage = msg.content
         const playerresult = playermessage.substring(1)
         console.log(playerresult)
@@ -516,17 +602,31 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             }
             
           }
-          if(msg.content=="세홍_바보"){
-              msg.channel.send("세홍")
-            
-          }
+          const packageJSON = require("./package.json");
 
+client.on("messageCreate", async (message) => {
+
+    if (message.author.bot) return;
+
+    if (message.content == "!stats") {
+        const discordJSVersion = packageJSON.dependencies["discord.js"];
+        const embed = new Discord.MessageEmbed()
+            .setColor("RANDOM")
+            .setTitle(`Bot stats - ${client.user.tag}`)
+            .addField("Discord.js version", discordJSVersion);
+        message.channel.send({
+            embeds: [embed]
+        });
+    }
+    
+});
+      
 
 
       }
-      } 
       
-           
+      
+    
       
     )
 client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
