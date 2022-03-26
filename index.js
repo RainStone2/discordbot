@@ -216,7 +216,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                     var prefix = "운석"
                     var multiple = 10000
       }}}}}
-      msg.channel.send(prefix + " 을(를) 발견했습니다!" + earningmap.get(msg.author) * Number(multiple) + " 원을 벌었습니다!")
+      msg.channel.send(prefix + "을(를) 발견했습니다! " + earningmap.get(msg.author) * Number(multiple) + "원을 벌었습니다!")
       lastmoney = Number(moneymap.get(msg.author));
       moneymap.set(msg.author, lastmoney += 1 * Number(multiple));
       console.log(moneymap.get(msg.author))
