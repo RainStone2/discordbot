@@ -234,6 +234,8 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       if(msg.content == ".b 1"){
         if(moneymap.get(msg.author) >= 1000 * earningmap.get(msg.author)){
           earning = Number(earningmap.get(msg.author))
+          lastmoney = moneymap.get(msg.author)
+          moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
           earningmap.set(msg.author, earning + 1)
           msg.channel.send("한번에 얻는 돈의 양이 많아졌다!")
         }
@@ -246,6 +248,8 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         if(msg.content == ".b 2"){
           if(moneymap.get(msg.author) >= 1000 * percentmap.get(msg.author)){
             percent = Number(percentmap.get(msg.author))
+            lastmoney = moneymap.get(msg.author)
+            moneymap.set(msg.author, lastmoney - 1000 * percentmap.get(msg.author))
             percentmap.set(msg.author, percent + 1)
             msg.channel.send("좋은 아이템을 발견할 확률이 늘어났다!")
           }
