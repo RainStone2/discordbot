@@ -93,18 +93,115 @@ const answermap = new Map();
 const answered = new Map();
 const moneymap = new Map();
 const accountCreated = new Map();
+const dungeonCreated = new Map();
 const percentmap = new Map();
 const earningmap = new Map();
-client.on('message', msg => {
+const Dplayer = new Map();
+const Dmoney = new Map();
+const Djob = new Map();
+const Dlevel = new Map();
+const Dexp = new Map();
+const Dhp = new Map();
+const Dmg = new Map();
+
+const Slevel = new Map();
+const Sexp = new Map();
+
+const Hlevel = new Map();
+const Hexp = new Map();
+
+const Wlevel = new Map();
+const Wexp = new Map();
+
+const Alevel = new Map();
+const Aexp = new Map();
+
+const Tlevel = new Map();
+const Texp = new Map();
+
+const Shealth = new Map();
+const Sdmg = new Map();
+const Smana = new Map();
+
+const Dinven = new Map();
+function percentage(max,per){
+
+  persent=per/max*100;
+  pr=""
+  for(i=0;i<persent;i+=10){
+    if(i>10){
+      pr+="█"
+      persent-=10
+    }
+  }
+
+
+  if(persent>9){
+    pr+="▉"
+  }else if(persent>8){
+    pr+="▊"
+  }else if(persent>6){
+    pr+="▋"
+  }else if(persent>5){
+    pr+="▌"
+  }else if(persent>3){
+    pr+="▍"
+  }else if(persent>1){
+    pr+="▎"
+  }
+  return pr
+}
+
+function workerexp(lev){
+  if(lev<10){
+    return 150
+  }else if(lev<15){
+    return 200
+  }else if(lev<20){
+    return 300
+  }else if(lev<25){
+    return 500
+  }else if(lev<30){
+    return 800
+  }else if(lev<35){
+    return 1000
+  }else if(lev<40){
+    return 1500
+  }else{
+    return 2000
+  }
+}
+
+function levelexp(lev){
+  if(lev<10){
+    return 500
+  }else if(lev<15){
+    return 600
+  }else if(lev<20){
+    return 900
+  }else if(lev<25){
+    return 1500
+  }else if(lev<30){
+    return 2500
+  }else if(lev<35){
+    return 4000
+  }else if(lev<40){
+    return 6500
+  }else{
+    return 10000
+  }
+}
+  
+   client.on('message', msg => {
   if(accountCreated.get(msg.author) != true){
     moneymap.set(msg.author, 0)
     percentmap.set(msg.author, 1)
     accountCreated.set(msg.author, true)
     earningmap.set(msg.author, 1)
     percentmap.set(msg.author, 1)
+    dungeonCreated.set(msg.author, 0)
   }
-
-
+  
 
   if (msg.content === '우돌') {
     msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
@@ -112,7 +209,7 @@ client.on('message', msg => {
   if (msg.content === '쿨냥') {
     msg.reply('쿨냥이는 2010년 2월 18일에 태어났으며 우돌이랑 같이 게임하는 매우 우돌이 유튜브에 도움을 주는 사람입니다');
   }
-
+  
   
   
   
@@ -199,6 +296,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 
 }
     if(msg.content == ".g"){
+      if(msg.author.username != "682358033937989632"){
       const randomint = Math.floor(Math.random()*1000)
       if(randomint <= 1000){
         var prefix = "동전"
@@ -215,7 +313,12 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                   if(randomint <= 5 + (5 * percentmap.get(msg.author))){
                     var prefix = "운석"
                     var multiple = 10000
-      }}}}}
+      }}}}}  
+    }
+    else{
+     var prefix = "우주의 기운"
+     var multiple = 1000000 
+    }
       msg.channel.send(prefix + "을(를) 발견했습니다! " + earningmap.get(msg.author) * Number(multiple) + "원을 벌었습니다!")
       lastmoney = Number(moneymap.get(msg.author));
       moneymap.set(msg.author, lastmoney += 1 * Number(multiple));
@@ -267,11 +370,80 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           .addField("운석 확률", String(0.5 + (0.5 * percentmap.get(msg.author))) + "%")
         msg.channel.send(percentembed);
         }
-
-  if (msg.content === '무한') {
-    msg.reply('무야호~');
+  if(msg.content == ".d m"){
+    if(dungeonCreated.get(msg.author) != 1){
+    Dplayer.set(msg.author, msg.author.username);
+    Dexp.set(msg.author, 0);
+    Djob.set(msg.author, 1);
+    Dlevel.set(msg.author, 1);
+    Dmoney.set(msg.author, 10000);
+    Dhp.set(msg.author, 1000);
+    Dmg.set(msg.author, 200);
+    Slevel.set(msg.author, 1);
+    Sexp.set(msg.author, 1);
+    Hlevel.set(msg.author, 1);
+    Hexp.set(msg.author, 1);
+    Wlevel.set(msg.author, 1);
+    Wexp.set(msg.author, 1);
+    Alevel.set(msg.author, 1);
+    Aexp.set(msg.author, 1);
+    Tlevel.set(msg.author, 1);
+    Texp.set(msg.author, 1);
+    Dinven.set(msg.author, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    dungeonCreated.set(msg.author, 1)
+    msg.channel.send("계정이 생성되었습니다.");
   }
-  
+  else if(dungeonCreated.get(msg.author) == 1){
+    msg.channel.send("이미 만들어진 계정이 있습니다!");
+  }
+}
+  if(msg.content == ".d s"){
+    //1-S 2-H 3-W 4-A 5-T
+    var SexpPT = Sexp.get(msg.author) / workerexp(((Slevel.get(msg.author)))) * 100
+    var HexpPT = Hexp.get(msg.author) / workerexp(((Hlevel.get(msg.author)))) * 100
+    var WexpPT = Wexp.get(msg.author) / workerexp(((Wlevel.get(msg.author)))) * 100
+    var AexpPT = Aexp.get(msg.author) / workerexp(((Alevel.get(msg.author)))) * 100
+    var TexpPT = Sexp.get(msg.author) / workerexp(((Tlevel.get(msg.author)))) * 100
+    const DstatEmbed = new Discord.MessageEmbed()
+    .setTitle(Dplayer.get(msg.author) + "님의 스텟")
+    .addField("레벨", Dlevel.get(msg.author))
+    .addField("돈", Dmoney.get(msg.author))
+    .addField("전사 : " + Slevel.get(msg.author)+ "레벨", SexpPT.toFixed(1)+ "%")
+    .addField("힐러 : " + Hlevel.get(msg.author)+ "레벨", HexpPT.toFixed(1)+"%")
+    .addField("마법사 : " + Wlevel.get(msg.author)+ "레벨",WexpPT.toFixed(1) +"%")
+    .addField("궁수 : " + Alevel.get(msg.author)+ "레벨",AexpPT.toFixed(1) +"%")
+    .addField("탱커 : " + Tlevel.get(msg.author)+ "레벨",TexpPT.toFixed(1) +"%")
+    msg.channel.send(DstatEmbed)
+  }
+  if(msg.content == ".d mt"){
+    const StoreEmbed = new Discord.MessageEmbed()
+    .setTitle("무기상점")
+    .setColor("#73F2F0")
+    .setDescription("상점 도움말입니다.")
+    .addField(".smt", "전사 상점입니다.")
+    .addField(".hmt", "힐러 상점입니다.")
+    .addField(".wmt", "마법사 상점입니다.")
+    .addField(".amt", "궁수 상점입니다.")
+    .addField(".tmt", "탱커 상점입니다.")
+    .addField(".imt", "아이템 상점입니다.")
+    msg.channel.send(StoreEmbed);
+  }
+  if(msg.content == ".w c S"){
+    msg.channel.send("직업을 전사로 바꿨습니다.")
+  }
+  else if(msg.content == ".w c H"){
+    msg.channel.send("직업을 힐러로 바꿨습니다.")
+  }
+  else if(msg.content == ".w c W"){
+    msg.channel.send("직업을 마법사로 바꿨습니다.")
+  }
+  else if(msg.content == ".w c A"){
+    msg.channel.send("직업을 궁수로 바꿨습니다.")
+  }
+  else if(msg.content == ".w c T"){
+    msg.channel.send("직업을 탱커로 바꿨습니다.")
+  }
+    
   if (msg.content === '제작자') {
     msg.reply('https://discord.gg/kGE8wxP2Nq 에서 제작자를 만나보세요!');
   }
