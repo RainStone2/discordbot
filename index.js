@@ -103,6 +103,7 @@ const Dlevel = new Map();
 const Dexp = new Map();
 const Dhp = new Map();
 const Dmg = new Map();
+const Dmana = new Map();
 
 const Slevel = new Map();
 const Sexp = new Map();
@@ -124,32 +125,45 @@ const Sdmg = new Map();
 const Smana = new Map();
 
 const Dinven = new Map();
-function percentage(max,per){
-
-  persent=per/max*100;
+function percentage(persent){
+  sp=20
+  j=persent
   pr=""
   for(i=0;i<persent;i+=10){
-    if(i>10){
+    if(persent>9.9){
       pr+="█"
       persent-=10
-    }
+      sp-=3
+      }
   }
 
 
   if(persent>9){
     pr+="▉"
+    sp-=3
   }else if(persent>8){
     pr+="▊"
+    sp-=3
   }else if(persent>6){
     pr+="▋"
+    sp-=3
   }else if(persent>5){
     pr+="▌"
+    sp-=3
   }else if(persent>3){
     pr+="▍"
-  }else if(persent>1){
+    sp-=3
+  }else if(persent>2){
     pr+="▎"
+    sp-=3
+  }else if(persent>1){
+    pr+="▏"
+    sp-=3
   }
-  return pr
+  for(i=0;i<sp;i++){
+    pr+=" "
+  }
+  return pr+j+"%"
 }
 
 function workerexp(lev){
@@ -374,21 +388,22 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     if(dungeonCreated.get(msg.author) != 1){
     Dplayer.set(msg.author, msg.author.username);
     Dexp.set(msg.author, 0);
-    Djob.set(msg.author, 1);
+    Djob.set(msg.author, 0);
     Dlevel.set(msg.author, 1);
     Dmoney.set(msg.author, 10000);
     Dhp.set(msg.author, 1000);
     Dmg.set(msg.author, 200);
+    Dmana.set(msg.author, 100);
     Slevel.set(msg.author, 1);
-    Sexp.set(msg.author, 1);
+    Sexp.set(msg.author, 0);
     Hlevel.set(msg.author, 1);
-    Hexp.set(msg.author, 1);
+    Hexp.set(msg.author, 0);
     Wlevel.set(msg.author, 1);
-    Wexp.set(msg.author, 1);
+    Wexp.set(msg.author, 0);
     Alevel.set(msg.author, 1);
-    Aexp.set(msg.author, 1);
+    Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
-    Texp.set(msg.author, 1);
+    Texp.set(msg.author, 0);
     Dinven.set(msg.author, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     dungeonCreated.set(msg.author, 1)
     msg.channel.send("계정이 생성되었습니다.");
@@ -399,51 +414,190 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 }
   if(msg.content == ".d s"){
     //1-S 2-H 3-W 4-A 5-T
-    var SexpPT = Sexp.get(msg.author) / workerexp(((Slevel.get(msg.author)))) * 100
-    var HexpPT = Hexp.get(msg.author) / workerexp(((Hlevel.get(msg.author)))) * 100
-    var WexpPT = Wexp.get(msg.author) / workerexp(((Wlevel.get(msg.author)))) * 100
-    var AexpPT = Aexp.get(msg.author) / workerexp(((Alevel.get(msg.author)))) * 100
-    var TexpPT = Sexp.get(msg.author) / workerexp(((Tlevel.get(msg.author)))) * 100
+    if(Djob.get(msg.author) == 1){
+      var job = "버서커"
+    }
+    else if(Djob.get(msg.author) == 2){
+      var job = "힐러"
+    }
+    else if(Djob.get(msg.author) == 3){
+      var job = "메이지"
+    }
+    else if(Djob.get(msg.author) == 4){
+      var job = "아처"
+    }
+    else if(Djob.get(msg.author) == 5){
+      var job = "탱커"
+    }
+    else{
+      var job = "미정"
+    }
     const DstatEmbed = new Discord.MessageEmbed()
     .setTitle(Dplayer.get(msg.author) + "님의 스텟")
-    .addField("레벨", Dlevel.get(msg.author))
-    .addField("돈", Dmoney.get(msg.author))
-    .addField("전사 : " + Slevel.get(msg.author)+ "레벨", SexpPT.toFixed(1)+ "%")
-    .addField("힐러 : " + Hlevel.get(msg.author)+ "레벨", HexpPT.toFixed(1)+"%")
-    .addField("마법사 : " + Wlevel.get(msg.author)+ "레벨",WexpPT.toFixed(1) +"%")
-    .addField("궁수 : " + Alevel.get(msg.author)+ "레벨",AexpPT.toFixed(1) +"%")
-    .addField("탱커 : " + Tlevel.get(msg.author)+ "레벨",TexpPT.toFixed(1) +"%")
+    .addField("현재 직업", job)
+    .addField("레벨", Dlevel.get(msg.author), true)
+    .addField("체력", Dhp.get(msg.author), true)
+    .addField("돈", Dmoney.get(msg.author), true)
+    .addField("데미지", Dmg.get(msg.author), true)
+    .addField("마나", Dmana.get(msg.author), true)
+    .addField("버서커 : " + Slevel.get(msg.author)+ "레벨", percentage((Sexp.get(msg.author) / workerexp(Slevel.get(msg.author)) * 100).toFixed(2)))
+    .addField("힐러 : " + Hlevel.get(msg.author)+ "레벨", percentage((Hexp.get(msg.author) / workerexp(Hlevel.get(msg.author)) * 100).toFixed(2)))
+    .addField("메이지 : " + Wlevel.get(msg.author)+ "레벨",percentage((Wexp.get(msg.author) / workerexp(Wlevel.get(msg.author)) * 100).toFixed(2)))
+    .addField("아처 : " + Alevel.get(msg.author)+ "레벨",percentage((Aexp.get(msg.author) / workerexp(Alevel.get(msg.author)) * 100).toFixed(2)))
+    .addField("탱커 : " + Tlevel.get(msg.author)+ "레벨",percentage((Texp.get(msg.author) / workerexp(Tlevel.get(msg.author)) * 100).toFixed(2)))
+    .addField("Tip. 만약 직업이 미정이라면", ".d c로 직업 변경 도움말을 확인해 보세요!")
     msg.channel.send(DstatEmbed)
+  }
+  if(msg.content == ".d c"){
+    msg.channel.send(".d cb -> 버서커로 직업 변경")
+    msg.channel.send(".d ch -> 힐러로 직업 변경")
+    msg.channel.send(".d cw -> 메이지로 직업 변경")
+    msg.channel.send(".d ca -> 아처로 직업 변경")
+    msg.channel.send(".d ct -> 탱커로 직업 변경")
   }
   if(msg.content == ".d mt"){
     const StoreEmbed = new Discord.MessageEmbed()
     .setTitle("무기상점")
     .setColor("#73F2F0")
     .setDescription("상점 도움말입니다.")
-    .addField(".smt", "전사 상점입니다.")
+    .addField(".bmt", "버서커 상점입니다.")
     .addField(".hmt", "힐러 상점입니다.")
-    .addField(".wmt", "마법사 상점입니다.")
-    .addField(".amt", "궁수 상점입니다.")
+    .addField(".wmt", "메이지 상점입니다.")
+    .addField(".amt", "아처 상점입니다.")
     .addField(".tmt", "탱커 상점입니다.")
     .addField(".imt", "아이템 상점입니다.")
     msg.channel.send(StoreEmbed);
   }
-  if(msg.content == ".w c S"){
-    msg.channel.send("직업을 전사로 바꿨습니다.")
+  if(msg.content == ".d cb"){
+    msg.channel.send("직업을 버서커로 바꿨습니다.")
+    hp = Dhp.get(msg.author)
+    damg = Dmg.get(msg.author)
+    Dhp.set(msg.author, hp * 1.5)
+    Dmg.set(msg.author, damg * 1.5)
+    Djob.set(msg.author, 1)
   }
-  else if(msg.content == ".w c H"){
+  else if(msg.content == ".d ch"){
     msg.channel.send("직업을 힐러로 바꿨습니다.")
+    hp = Dhp.get(msg.author)
+    damg = Dmg.get(msg.author)
+    Djob.set(msg.author, 2)
   }
-  else if(msg.content == ".w c W"){
-    msg.channel.send("직업을 마법사로 바꿨습니다.")
+  else if(msg.content == ".d cm"){
+    msg.channel.send("직업을 메이지로 바꿨습니다.")
+    hp = Dhp.get(msg.author)
+    damg = Dmg.get(msg.author)
+    mana = Dmana.get(msg.author)
+    Dmana.set(msg.author, mana*2)
+    Djob.set(msg.author, 3)
   }
-  else if(msg.content == ".w c A"){
-    msg.channel.send("직업을 궁수로 바꿨습니다.")
+  else if(msg.content == ".d ca"){
+    msg.channel.send("직업을 아처로 바꿨습니다.")
+    hp = Dhp.get(msg.author)
+    damg = Dmg.get(msg.author)
+    Dhp.set(msg.author, hp*0.7)
+    Dmg.set(msg.author, damg*1.7)
+    Djob.set(msg.author, 4)
   }
-  else if(msg.content == ".w c T"){
+  else if(msg.content == ".d ct"){
     msg.channel.send("직업을 탱커로 바꿨습니다.")
+    hp = Dhp.get(msg.author)
+    damg = Dmg.get(msg.author)
+    Dhp.set(msg.author, hp*2)
+    Djob.set(msg.author, 5)
   }
+  function inventorynum(num){
+    //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
+    if(num==1){
+      return ["대검","검",3000,0,0]
+    }else if(num==2){
+      return ["전사의 대검","검",7000,0,0]
+    }else if(num==3){
+      return ["철재 대검","검",5000,0,1]
+    }else if(num==4){
+      return ["금 대검","검",7000,0,1]
+    }else if(num==5){
+      return ["다이아 대검","검",10000,0,1]
+    }else if(num==6){
+      return ["파이어 대검","검",20000,0,1]
+    }else if(num==7){
+      return ["체력의 대검","검",10000,0,0]
+    }
     
+    else if(num==8){
+      return ["화살","활",20,0,0]
+    }else if(num==9){
+      return ["보우","활",5000,0,0]
+    }else if(num==10){
+      return ["레인보우 보우","활",7000,0,1]
+    }else if(num==11){
+      return ["레전더리 보우","활",10000,0,1]
+    }else if(num==12){
+      return ["석궁","활",7000,0,0]
+    }
+    
+    else if(num==13){
+      return ["마법사의 지팡이","지팡이",7000,0,0]
+    }else if(num==14){
+      return ["마법사의 아이스 지팡이","지팡이",7000,0,1]
+    }else if(num==15){
+      return ["마법사의 파이어 지팡이","지팡이",7000,0,1]
+    }else if(num==16){
+      return ["힐러의 지팡이","지팡이",7000,0,0]
+    }
+    
+    else if(num==17){
+      return ["체력의 갑옷","갑옷",5000,0,0]
+    }else if(num==18){
+      return ["마법사의 갑옷","갑옷",5000,0,0]
+    }else if(num==19){
+      return ["귀한 갑옷","갑옷",3000,0,0]
+    }else if(num==20){
+      return ["철재 갑옷","갑옷",7000,0,1]
+    }else if(num==21){
+      return ["다이아 갑옷","갑옷",10000,0,1]
+    }else if(num==22){
+      return ["전설의 갑옷","갑옷",20000,0,1]
+    }
+    
+    else if(num==23){
+      return ["체력의 포션","포션",20000,0,0]
+    }else if(num==24){
+      return ["회복의 포션","포션",2000,0,0]
+    }else if(num==25){
+      return ["힘의 포션","포션",2000,0,0]
+    }
+    
+    else if(num==26){
+      return ["돌","돌",50,1,0]
+    }else if(num==27){
+      return ["철","돌",200,1,0]
+    }else if(num==28){
+      return ["금","돌",300,1,0]
+    }else if(num==29){
+      return ["다이아","돌",500,1,0]
+    }
+    
+    else if(num==30){
+      return ["뼈","몬템",100,1,0]
+    }else if(num==31){
+      return ["가죽","몬템",100,1,0]
+    }else if(num==32){
+      return ["포션","몬템",500,1,0]
+    }else if(num==33){
+      return ["탱탱볼","몬템",700,1,0]
+    }else if(num==34){
+      return ["사신의 대검","몬템",1500,1,0]
+    }
+    
+    else if(num==35){
+      return ["아이스 조각","보스",500,1,0]
+    }else if(num==36){
+      return ["파이어 조각","보스",5000,1,0]
+    }else if(num==37){
+      return ["전설의 조각","보스",1000,1,0]
+    }
+  }
+  
   if (msg.content === '제작자') {
     msg.reply('https://discord.gg/kGE8wxP2Nq 에서 제작자를 만나보세요!');
   }
