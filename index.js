@@ -104,7 +104,10 @@ const Dexp = new Map();
 const Dhp = new Map();
 const Dmg = new Map();
 const Dmana = new Map();
-
+const SThp = new Map();
+const STdmg = new Map();
+const STmana = new Map();
+const Dstat = new Map();
 const Slevel = new Map();
 const Sexp = new Map();
 
@@ -125,6 +128,379 @@ const Sdmg = new Map();
 const Smana = new Map();
 
 const Dinven = new Map();
+function random(small, big) {
+  return Math.floor(Math.random() * (big - small)) + small;
+}
+
+
+function inventorynum(num){
+//이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
+if(num==1){
+  return ["대검","검",3000,0,0]
+}else if(num==2){
+  return ["전사의 대검","검",7000,0,0]
+}else if(num==3){
+  return ["철재 대검","검",5000,0,1]
+}else if(num==4){
+  return ["금 대검","검",7000,0,1]
+}else if(num==5){
+  return ["다이아 대검","검",10000,0,1]
+}else if(num==6){
+  return ["파이어 대검","검",20000,0,1]
+}else if(num==7){
+  return ["체력의 대검","검",10000,0,0]
+}
+
+else if(num==8){
+  return ["화살","활",20,0,0]
+}else if(num==9){
+  return ["보우","활",5000,0,0]
+}else if(num==10){
+  return ["레인보우 보우","활",7000,0,1]
+}else if(num==11){
+  return ["레전더리 보우","활",10000,0,1]
+}else if(num==12){
+  return ["석궁","활",7000,0,0]
+}
+
+else if(num==13){
+  return ["마법사의 지팡이","지팡이",7000,0,0]
+}else if(num==14){
+  return ["마법사의 아이스 지팡이","지팡이",7000,0,1]
+}else if(num==15){
+  return ["마법사의 파이어 지팡이","지팡이",7000,0,1]
+}else if(num==16){
+  return ["힐러의 지팡이","지팡이",7000,0,0]
+}
+
+else if(num==17){
+  return ["체력의 갑옷","갑옷",5000,0,0]
+}else if(num==18){
+  return ["마법사의 갑옷","갑옷",5000,0,0]
+}else if(num==19){
+  return ["귀한 갑옷","갑옷",3000,0,0]
+}else if(num==20){
+  return ["철재 갑옷","갑옷",7000,0,1]
+}else if(num==21){
+  return ["다이아 갑옷","갑옷",10000,0,1]
+}else if(num==22){
+  return ["전설의 갑옷","갑옷",20000,0,1]
+}
+
+else if(num==23){
+  return ["체력의 포션","포션",20000,0,0]
+}else if(num==24){
+  return ["회복의 포션","포션",2000,0,0]
+}else if(num==25){
+  return ["힘의 포션","포션",2000,0,0]
+}
+
+else if(num==26){
+  return ["돌","돌",50,1,0]
+}else if(num==27){
+  return ["철","돌",200,1,0]
+}else if(num==28){
+  return ["금","돌",300,1,0]
+}else if(num==29){
+  return ["다이아","돌",500,1,0]
+}
+
+else if(num==30){
+  return ["뼈","몬템",100,1,0]
+}else if(num==31){
+  return ["가죽","몬템",100,1,0]
+}else if(num==32){
+  return ["포션","몬템",500,1,0]
+}else if(num==33){
+  return ["탱탱볼","몬템",700,1,0]
+}else if(num==34){
+  return ["사신의 대검","몬템",1500,1,0]
+}
+
+else if(num==35){
+  return ["아이스 조각","보스",500,1,0]
+}else if(num==36){
+  return ["파이어 조각","보스",5000,1,0]
+}else if(num==37){
+  return ["전설의 조각","보스",1000,1,0]
+}
+}
+
+function inventorymaterial(num){
+//필요돈,필요재료,겟수
+if(num==3){
+  return [3000,27,10]
+}else if(num==4){
+  return [4000,28,10]
+}else if(num==5){
+  return [5000,29,5]
+}else if(num==6){
+  return [7000,36,1]
+}
+
+else if(num==10){
+  return [5000,30,10]
+}else if(num==11){
+  return [7000,37,3]
+}
+
+else if(num==14){
+  return [5000,35,2]
+}else if(num==15){
+  return [5000,36,2]
+}
+
+else if(num==20){
+  return [3000,27,10]
+}else if(num==21){
+  return [5000,29,5]
+}else if(num==22){
+  return [7000,37,3]
+}
+}
+
+function inventorydamage(num){
+//1000:1배
+
+if(num==1){
+  return 1200
+}else if(num==2){
+  return 1500
+}else if(num==3){
+  return 1400
+}else if(num==4){
+  return 1700
+}else if(num==5){
+  return 2000
+}else if(num==6){
+  return 2500  //할수있으면 화염 대미지도
+}else if(num==7){
+  return 1300
+}
+
+else if(num==9){
+  return 1500
+}else if(num==10){
+  return 2000
+}else if(num==11){
+  return 3000
+}else if(num==12){
+  return 1300
+}
+}
+
+function inventorymagic(num){
+//원래 100
+
+if(num==13){
+  return 200
+}else if(num==14){
+  return 300  //지속적임,약함
+}else if(num==15){
+  return 300  //짧음    ,강함
+}else if(num==16){
+  return 500
+}
+
+else if(num==18){
+  return 200
+}
+}
+
+function inventorydefens(num){
+//원래 10000
+
+if(num==7){
+  return 15000
+}
+
+else if(num==17){
+  return 20000
+}else if(num==19){
+  return 17000
+}else if(num==20){
+  return 20000
+}else if(num==21){
+  return 25000
+}else if(num==22){
+  return 35000
+}
+}
+
+function inventoryDurability(num){
+if(num==1){
+  return 500
+}else if(num==2){
+  return 700
+}else if(num==3){
+  return 700
+}else if(num==4){
+  return 700
+}else if(num==5){
+  return 1500
+}else if(num==6){
+  return 2000
+}else if(num==7){
+  return 1000
+}
+
+else if(num==9){
+  return 700
+}else if(num==10){
+  return 1000
+}else if(num==11){
+  return 1500
+}else if(num==12){
+  return 1000
+}
+
+else if(num==13){
+  return 800
+}else if(num==14){
+  return 1500
+}else if(num==15){
+  return 1500
+}else if(num==16){
+  return 1000
+}
+
+else if(num==17){
+  return 1500
+}else if(num==18){
+  return 1000
+}else if(num==19){
+  return 1000
+}else if(num==20){
+  return 1500
+}else if(num==21){
+  return 2000
+}else if(num==22){
+  return 2500
+}
+}
+function inventoryinformation(num) {
+  msg=num
+  if(msg<37){
+
+  pr=""
+
+
+  pr+="           "+inventorynum(msg)[0]+"           "
+
+
+  pr+="\n종류:"+inventorynum(msg)[1]
+  for(i=0;i<3-inventorynum(msg)[1].length;i++){
+    pr+="    "
+  }
+
+
+  pr+="     가격:"+inventorynum(msg)[2]
+
+
+  if(inventorynum(msg)[3]==0) pr+="\n살수 있음"
+  else pr+="\n팔수 있음"
+
+
+  if(inventorynum(msg)[4]==1) pr+="         만들기 O"
+  else pr+="        만들기 X"
+
+
+  if(inventorynum(msg)[1]=="검" || inventorynum(msg)[1]=="활"){
+    if(msg==7){
+    pr+="\n방어력:"+inventorymagic(msg)
+    }
+    else{
+    pr+="\n데미지:"+inventorydamage(msg)
+    }
+  }
+  if(inventorynum(msg)[1]=="지팡이"){
+    pr+="\n마법력:"+inventorymagic(msg)
+  }
+  if(inventorynum(msg)[1]=="갑옷"){
+    if(msg==18){
+    pr+="\n마법력:"+inventorymagic(msg)
+    }
+    else{
+    pr+="\n방어력:"+inventorydefens(msg)
+    }
+  }
+
+  if(inventorynum(msg)[4]==1){ 
+    pr+="\n재료:"
+    pr+="\n필요돈:"+inventorymaterial(msg)[0]
+    pr+="\n필요 재료:"+inventorynum(inventorymaterial(msg)[1])[0]+"  X "+inventorymaterial(msg)[2]
+  }
+
+
+  return pr
+
+  }
+  else{
+    return "그 번호의 인벤토리는 없습니다"
+  }
+}
+
+function inventoryinformation(num) {
+  msg=num
+  if(msg<37){
+
+  pr=""
+
+
+  pr+="           "+inventorynum(msg)[0]+"           "
+
+
+  pr+="\n종류:"+inventorynum(msg)[1]
+  for(i=0;i<3-inventorynum(msg)[1].length;i++){
+    pr+="    "
+  }
+
+
+  pr+="     가격:"+inventorynum(msg)[2]
+
+
+  if(inventorynum(msg)[3]==0) pr+="\n살수 있음"
+  else pr+="\n팔수 있음"
+
+
+  if(inventorynum(msg)[4]==1) pr+="         만들기 O"
+  else pr+="        만들기 X"
+
+
+  if(inventorynum(msg)[1]=="검" || inventorynum(msg)[1]=="활"){
+    if(msg==7){
+    pr+="\n방어력:"+inventorymagic(msg)
+    }
+    else{
+    pr+="\n데미지:"+inventorydamage(msg)
+    }
+  }
+  if(inventorynum(msg)[1]=="지팡이"){
+    pr+="\n마법력:"+inventorymagic(msg)
+  }
+  if(inventorynum(msg)[1]=="갑옷"){
+    if(msg==18){
+    pr+="\n마법력:"+inventorymagic(msg)
+    }
+    else{
+    pr+="\n방어력:"+inventorydefens(msg)
+    }
+  }
+
+  if(inventorynum(msg)[4]==1){ 
+    pr+="\n재료:"
+    pr+="\n필요돈:"+inventorymaterial(msg)[0]
+    pr+="\n필요 재료:"+inventorynum(inventorymaterial(msg)[1])[0]+"  X "+inventorymaterial(msg)[2]
+  }
+
+
+  return pr
+
+  }
+  else{
+    return "그 번호의 인벤토리는 없습니다"
+  }
+}
 function percentage(persent){
   sp=20
   j=persent
@@ -165,7 +541,6 @@ function percentage(persent){
   }
   return pr+j+"%"
 }
-
 function workerexp(lev){
   if(lev<10){
     return 150
@@ -214,6 +589,30 @@ function levelexp(lev){
     earningmap.set(msg.author, 1)
     percentmap.set(msg.author, 1)
     dungeonCreated.set(msg.author, 0)
+    Dplayer.set(msg.author, msg.author.username);
+    Dexp.set(msg.author, 0);
+    Djob.set(msg.author, 0);
+    Dlevel.set(msg.author, 1);
+    Dmoney.set(msg.author, 10000);
+    Dhp.set(msg.author, 1000);
+    Dmg.set(msg.author, 200);
+    Dmana.set(msg.author, 100);
+    Dstat.set(msg.author, 3)
+    Slevel.set(msg.author, 1);
+    Sexp.set(msg.author, 0);
+    Hlevel.set(msg.author, 1);
+    Hexp.set(msg.author, 0);
+    Wlevel.set(msg.author, 1);
+    Wexp.set(msg.author, 0);
+    Alevel.set(msg.author, 1);
+    Aexp.set(msg.author, 0);
+    Tlevel.set(msg.author, 1);
+    Texp.set(msg.author, 0);
+    Dinven.set(msg.author, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    SThp.set(msg.author, 0);
+    STdmg.set(msg.author, 0);
+    STmana.set(msg.author, 0);
+    dungeonCreated.set(msg.author, 1)
   }
   
 
@@ -384,34 +783,8 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           .addField("운석 확률", String(0.5 + (0.5 * percentmap.get(msg.author))) + "%")
         msg.channel.send(percentembed);
         }
-  if(msg.content == ".d m"){
-    if(dungeonCreated.get(msg.author) != 1){
-    Dplayer.set(msg.author, msg.author.username);
-    Dexp.set(msg.author, 0);
-    Djob.set(msg.author, 0);
-    Dlevel.set(msg.author, 1);
-    Dmoney.set(msg.author, 10000);
-    Dhp.set(msg.author, 1000);
-    Dmg.set(msg.author, 200);
-    Dmana.set(msg.author, 100);
-    Slevel.set(msg.author, 1);
-    Sexp.set(msg.author, 0);
-    Hlevel.set(msg.author, 1);
-    Hexp.set(msg.author, 0);
-    Wlevel.set(msg.author, 1);
-    Wexp.set(msg.author, 0);
-    Alevel.set(msg.author, 1);
-    Aexp.set(msg.author, 0);
-    Tlevel.set(msg.author, 1);
-    Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    dungeonCreated.set(msg.author, 1)
-    msg.channel.send("계정이 생성되었습니다.");
-  }
-  else if(dungeonCreated.get(msg.author) == 1){
-    msg.channel.send("이미 만들어진 계정이 있습니다!");
-  }
-}
+
+
   if(msg.content == ".d s"){
     //1-S 2-H 3-W 4-A 5-T
     if(Djob.get(msg.author) == 1){
@@ -447,6 +820,66 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("탱커 : " + Tlevel.get(msg.author)+ "레벨",percentage((Texp.get(msg.author) / workerexp(Tlevel.get(msg.author)) * 100).toFixed(2)))
     .addField("Tip. 만약 직업이 미정이라면", ".d c로 직업 변경 도움말을 확인해 보세요!")
     msg.channel.send(DstatEmbed)
+  }
+  if(msg.content == ".d st"){
+    const Statembed = new Discord.MessageEmbed()
+    .setTitle(msg.author.username + "님의 던전 스텟")
+    .addField("체력", SThp.get(msg.author))
+    .addField("근력", STdmg.get(msg.author))
+    .addField("마법", STmana.get(msg.author))
+    msg.channel.send(Statembed);
+  }
+  if(msg.content == ".d sk"){
+    const skEmbed = new Discord.MessageEmbed()
+    .setTitle("배부할 스텟을 선택해 주세요.")
+    .addField(".d s1", "체력")
+    .addField(".d s2", "근력")
+    .addField(".d s3", "마법")    
+    msg.channel.send(skEmbed)
+  }
+  ad=msg.content
+
+  a=ad.split(" ")
+  if(a[0]==".d" && a[1]=="ii"){
+    msg.channel.send(inventoryinformation(a[2]))
+  }
+    
+  
+  if(msg.content == ".d s1"){
+    var stat = Dstat.get(msg.author);
+    if(stat > 0){
+      var DhpSt = SThp.get(msg.author)
+      msg.channel.send("체력 스탯이 1 올랐습니다!")
+      Dstat.set(msg.author, stat - 1);
+      SThp.set(msg.author, DhpSt + 1);
+    }
+    else{
+      msg.channel.send("포인트가 부족합니다.")
+    }
+  }
+  else if(msg.content == ".d s2"){
+    var stat = Dstat.get(msg.author);
+    if(stat > 0){
+      var DdmgSt = STdmg.get(msg.author)
+      msg.channel.send("근력 스탯이 1 올랐습니다!")
+      Dstat.set(msg.author, stat - 1);
+      STdmg.set(msg.author, DdmgSt + 1);
+    }
+    else{
+      msg.channel.send("포인트가 부족합니다.")
+    }
+  }
+  else if(msg.content == ".d s3"){
+    var stat = Dstat.get(msg.author);
+    if(stat > 0){
+      var DmanaSt = SThp.get(msg.author)
+      msg.channel.send("마법 스탯이 1 올랐습니다!")
+      Dstat.set(msg.author, stat - 1);
+      STmana.set(msg.author, DmanaSt + 1);
+    }
+    else{
+      msg.channel.send("포인트가 부족합니다.")
+    }
   }
   if(msg.content == ".d c"){
     msg.channel.send(".d cb -> 버서커로 직업 변경")
@@ -504,98 +937,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     damg = Dmg.get(msg.author)
     Dhp.set(msg.author, hp*2)
     Djob.set(msg.author, 5)
-  }
-  function inventorynum(num){
-    //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
-    if(num==1){
-      return ["대검","검",3000,0,0]
-    }else if(num==2){
-      return ["전사의 대검","검",7000,0,0]
-    }else if(num==3){
-      return ["철재 대검","검",5000,0,1]
-    }else if(num==4){
-      return ["금 대검","검",7000,0,1]
-    }else if(num==5){
-      return ["다이아 대검","검",10000,0,1]
-    }else if(num==6){
-      return ["파이어 대검","검",20000,0,1]
-    }else if(num==7){
-      return ["체력의 대검","검",10000,0,0]
-    }
-    
-    else if(num==8){
-      return ["화살","활",20,0,0]
-    }else if(num==9){
-      return ["보우","활",5000,0,0]
-    }else if(num==10){
-      return ["레인보우 보우","활",7000,0,1]
-    }else if(num==11){
-      return ["레전더리 보우","활",10000,0,1]
-    }else if(num==12){
-      return ["석궁","활",7000,0,0]
-    }
-    
-    else if(num==13){
-      return ["마법사의 지팡이","지팡이",7000,0,0]
-    }else if(num==14){
-      return ["마법사의 아이스 지팡이","지팡이",7000,0,1]
-    }else if(num==15){
-      return ["마법사의 파이어 지팡이","지팡이",7000,0,1]
-    }else if(num==16){
-      return ["힐러의 지팡이","지팡이",7000,0,0]
-    }
-    
-    else if(num==17){
-      return ["체력의 갑옷","갑옷",5000,0,0]
-    }else if(num==18){
-      return ["마법사의 갑옷","갑옷",5000,0,0]
-    }else if(num==19){
-      return ["귀한 갑옷","갑옷",3000,0,0]
-    }else if(num==20){
-      return ["철재 갑옷","갑옷",7000,0,1]
-    }else if(num==21){
-      return ["다이아 갑옷","갑옷",10000,0,1]
-    }else if(num==22){
-      return ["전설의 갑옷","갑옷",20000,0,1]
-    }
-    
-    else if(num==23){
-      return ["체력의 포션","포션",20000,0,0]
-    }else if(num==24){
-      return ["회복의 포션","포션",2000,0,0]
-    }else if(num==25){
-      return ["힘의 포션","포션",2000,0,0]
-    }
-    
-    else if(num==26){
-      return ["돌","돌",50,1,0]
-    }else if(num==27){
-      return ["철","돌",200,1,0]
-    }else if(num==28){
-      return ["금","돌",300,1,0]
-    }else if(num==29){
-      return ["다이아","돌",500,1,0]
-    }
-    
-    else if(num==30){
-      return ["뼈","몬템",100,1,0]
-    }else if(num==31){
-      return ["가죽","몬템",100,1,0]
-    }else if(num==32){
-      return ["포션","몬템",500,1,0]
-    }else if(num==33){
-      return ["탱탱볼","몬템",700,1,0]
-    }else if(num==34){
-      return ["사신의 대검","몬템",1500,1,0]
-    }
-    
-    else if(num==35){
-      return ["아이스 조각","보스",500,1,0]
-    }else if(num==36){
-      return ["파이어 조각","보스",5000,1,0]
-    }else if(num==37){
-      return ["전설의 조각","보스",1000,1,0]
-    }
   }
   
   if (msg.content === '제작자') {
@@ -733,7 +1074,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
        
             }
             if(msg.content.startsWith("#")){
-              console.log("놈ㅇ내ㅑ")
               const rplayermessage = msg.content
               const rplayerresult = rplayermessage.substring(1)
               console.log(rplayerresult)
