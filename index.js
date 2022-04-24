@@ -104,6 +104,7 @@ const Dexp = new Map();
 const Dhp = new Map();
 const Dmg = new Map();
 const Dmana = new Map();
+const Darmor = new Map();
 const SThp = new Map();
 const STdmg = new Map();
 const STmana = new Map();
@@ -132,7 +133,15 @@ function random(small, big) {
   return Math.floor(Math.random() * (big - small)) + small;
 }
 
+function inventoryFind(num, UserInven){
+  for(var index = 0; index < UserInven.length + 1; index++){
+    if(UserInven[index] == num){
+      console.log(index)
+      return index;
+    }
+  }
 
+}
 function inventorynum(num){
 //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
 if(num==1){
@@ -261,7 +270,6 @@ else if(num==20){
 
 function inventorydamage(num){
 //1000:1배
-
 if(num==1){
   return 1200
 }else if(num==2){
@@ -277,7 +285,9 @@ if(num==1){
 }else if(num==7){
   return 1300
 }
-
+else if(num==8){
+  return 100
+}
 else if(num==9){
   return 1500
 }else if(num==10){
@@ -309,9 +319,11 @@ else if(num==18){
 
 function inventorydefens(num){
 //원래 10000
-
+console.log("우주웅")
 if(num==7){
+  console.log("우주우주")
   return 15000
+  
 }
 
 else if(num==17){
@@ -379,72 +391,10 @@ else if(num==17){
 }
 }
 function inventoryinformation(num) {
-  msg=num
-  if(msg<37){
+  msg=Number(num)
+  if(msg<=37){
 
-  pr=""
-
-
-  pr+="           "+inventorynum(msg)[0]+"           "
-
-
-  pr+="\n종류:"+inventorynum(msg)[1]
-  for(i=0;i<3-inventorynum(msg)[1].length;i++){
-    pr+="    "
-  }
-
-
-  pr+="     가격:"+inventorynum(msg)[2]
-
-
-  if(inventorynum(msg)[3]==0) pr+="\n살수 있음"
-  else pr+="\n팔수 있음"
-
-
-  if(inventorynum(msg)[4]==1) pr+="         만들기 O"
-  else pr+="        만들기 X"
-
-
-  if(inventorynum(msg)[1]=="검" || inventorynum(msg)[1]=="활"){
-    if(msg==7){
-    pr+="\n방어력:"+inventorymagic(msg)
-    }
-    else{
-    pr+="\n데미지:"+inventorydamage(msg)
-    }
-  }
-  if(inventorynum(msg)[1]=="지팡이"){
-    pr+="\n마법력:"+inventorymagic(msg)
-  }
-  if(inventorynum(msg)[1]=="갑옷"){
-    if(msg==18){
-    pr+="\n마법력:"+inventorymagic(msg)
-    }
-    else{
-    pr+="\n방어력:"+inventorydefens(msg)
-    }
-  }
-
-  if(inventorynum(msg)[4]==1){ 
-    pr+="\n재료:"
-    pr+="\n필요돈:"+inventorymaterial(msg)[0]
-    pr+="\n필요 재료:"+inventorynum(inventorymaterial(msg)[1])[0]+"  X "+inventorymaterial(msg)[2]
-  }
-
-
-  return pr
-
-  }
-  else{
-    return "그 번호의 인벤토리는 없습니다"
-  }
-}
-
-function inventoryinformation(num) {
-  msg=num
-  if(msg<37){
-
-  pr=""
+  var pr=""
 
 
   pr+="           "+inventorynum(msg)[0]+"           "
@@ -468,22 +418,21 @@ function inventoryinformation(num) {
 
 
   if(inventorynum(msg)[1]=="검" || inventorynum(msg)[1]=="활"){
-    if(msg==7){
-    pr+="\n방어력:"+inventorymagic(msg)
+    if(msg == 7){
+      pr+="\n방어력:"+String(inventorydefens(msg))
     }
-    else{
-    pr+="\n데미지:"+inventorydamage(msg)
-    }
+    pr+="\n데미지:"+String(inventorydamage(msg))
+    
   }
   if(inventorynum(msg)[1]=="지팡이"){
-    pr+="\n마법력:"+inventorymagic(msg)
+    pr+="\n마법력:"+String(inventorymagic(msg))
   }
   if(inventorynum(msg)[1]=="갑옷"){
     if(msg==18){
-    pr+="\n마법력:"+inventorymagic(msg)
+    pr+="\n마법력:"+String(inventorymagic(msg))
     }
     else{
-    pr+="\n방어력:"+inventorydefens(msg)
+    pr+="\n방어력:"+String(inventorydefens(msg))
     }
   }
 
@@ -501,6 +450,8 @@ function inventoryinformation(num) {
     return "그 번호의 인벤토리는 없습니다"
   }
 }
+
+
 function percentage(persent){
   sp=20
   j=persent
@@ -598,6 +549,7 @@ function levelexp(lev){
     Dmg.set(msg.author, 200);
     Dmana.set(msg.author, 100);
     Dstat.set(msg.author, 3)
+    Darmor.set(msg.author, 0)
     Slevel.set(msg.author, 1);
     Sexp.set(msg.author, 0);
     Hlevel.set(msg.author, 1);
@@ -608,14 +560,102 @@ function levelexp(lev){
     Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
     Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    Dinven.set(msg.author, [17, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
     STmana.set(msg.author, 0);
     dungeonCreated.set(msg.author, 1)
   }
-  
-
+  if(msg.content == ".d am"){
+    if(Darmor.get(msg.author) >= 17 && Darmor.get(msg.author) <= 22){
+      if(Darmor.get(msg.author) == 17){
+      var ArmorStatus = "체력의 갑옷"
+      }
+      if(Darmor.get(msg.author) == 18){
+        var ArmorStatus = "마법사 갑옷"
+        }
+      if(Darmor.get(msg.author) == 19){
+      var ArmorStatus = "귀한 갑옷"
+      }
+      if(Darmor.get(msg.author) == 20){
+        var ArmorStatus = "철제 갑옷"
+        }
+      if(Darmor.get(msg.author) == 21){
+      var ArmorStatus = "다이아 갑옷"
+      }
+      if(Darmor.get(msg.author) == 22){
+        var ArmorStatus = "전설의 갑옷"
+        }
+    }
+    else{
+      var ArmorStatus = "착용 안함"
+    }
+    const ArmorEmbed = new Discord.MessageEmbed()
+    .setTitle("갑옷 착용 명령어")
+    .setDescription("착용 중인 갑옷 : "+ArmorStatus)
+    .addField(".d am1", "체력의 갑옷을 착용합니다.", true)
+    .addField(".d am2", "마법사 갑옷을 착용합니다.", true)
+    .addField(".d am3", "귀한 갑옷을 착용합니다.", true)
+    .addField(".d am4", "철제 갑옷을 착용합니다.", true)
+    .addField(".d am5", "다이아 갑옷을 착용합니다.", true)
+    .addField(".d am6", "전설의 갑옷을 착용합니다.", true)
+    msg.channel.send(ArmorEmbed)
+  }
+  if(msg.content == ".d am1"){
+    if(inventoryFind(17, Dinven.get(msg.author)) >= 0){
+    msg.channel.send("체력의 갑옷을 착용했습니다.")
+    Darmor.set(msg.author, 17)
+    }
+    else{
+      msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+    }
+  }
+  if(msg.content == ".d am2"){
+    if(inventoryFind(18, Dinven.get(msg.author)) >= 0){
+      msg.channel.send("마법사 갑옷을 착용했습니다.")
+      Darmor.set(msg.author, 18)
+      }
+      else{
+        msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+      }
+  }
+  if(msg.content == ".d am3"){
+    if(inventoryFind(19, Dinven.get(msg.author)) >= 0){
+      msg.channel.send("귀한 갑옷을 착용했습니다.")
+      Darmor.set(msg.author, 19)
+      }
+      else{
+        msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+      }
+  }
+  if(msg.content == ".d am4"){
+    if(inventoryFind(20, Dinven.get(msg.author)) >= 0){
+      msg.channel.send("철제의 갑옷을 착용했습니다.")
+      Darmor.set(msg.author, 20)
+      }
+      else{
+        msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+      }
+  }
+  if(msg.content == ".d am5"){
+    if(inventoryFind(21, Dinven.get(msg.author)) >= 0){
+      msg.channel.send("다이아 갑옷을 착용했습니다.")
+      Darmor.set(msg.author, 21)
+      }
+      else{
+        msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+      }
+  }
+  if(msg.content == ".d am6"){
+    if(inventoryFind(22, Dinven.get(msg.author)) >= 0){
+      msg.channel.send("전설의 갑옷을 착용했습니다.")
+      Dinven.get(msg.author)  
+      Darmor.set(msg.author, 22)
+      }
+      else{
+        msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
+      }
+  }
   if (msg.content === '우돌') {
     msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
   }
@@ -940,7 +980,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
   }
   
   if (msg.content === '제작자') {
-    msg.reply('https://discord.gg/kGE8wxP2Nq 에서 제작자를 만나보세요!');
+    msg.reply('https://discord.gg/pcsMCJBj3S에서 제작자를 만나보세요!');
   }
   
     
