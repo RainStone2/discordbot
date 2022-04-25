@@ -18,6 +18,16 @@ const { deepStrictEqual } = require('assert');
 const { constants } = require('buffer');
 const Discord = require('discord.js');
 const fs = require('fs');
+const mysql = require('mysql');
+const sql = require('./sql.js');
+const pool = mysql.createPool({
+  connectionLimit : 10,
+  prot : 3306,
+  host : '127.0.0.1',
+  user : 'RainStone2',
+  password : 'RainStone2',
+  database : 'bot_playerinfo'
+});
 const { getgid } = require('process');
 const { fileURLToPath } = require('url');
 //const client = new Discord.Client();
@@ -42,7 +52,20 @@ function getDictionary(input, callback) {
     method: 'GET', 
     // json: true
   };
+  const query = async (alias, values) => {
+    return new Promise((resolve, reject) => pool.query(sql[alias], values, (error, results) => {
+      if (error) {  // 에러가 발생 
+        console.log(error);
+        reject({
+          error
+        });
+      } else resolve(results); // 쿼리 결과를 전달
+    }));
+  }
   
+  module.exports = {
+    query
+  };
   var req = https.request(naverDictionaryInfo, (res) => {
     let body = "";
     console.log('statusCode:', res.statusCode);
@@ -111,6 +134,9 @@ const STmana = new Map();
 const Dstat = new Map();
 const Slevel = new Map();
 const Sexp = new Map();
+const WaitingForAtack = new Map();
+const EquippedSword = new Map();
+const Dequiped = new Map();
 
 const Hlevel = new Map();
 const Hexp = new Map();
@@ -141,6 +167,31 @@ function inventoryFind(num, UserInven){
     }
   }
 
+}
+function monster_information(num1,num2){
+
+  //이름,체력,데미지,쿨타임,스테이지
+
+  if(num1==1){
+    if(num2==1) return ["해골"  ,300,100 ,2  ,1]  //1
+    if(num2==2) return ["맷돼지",500,500 ,3  ,1]  //1~2
+    if(num2==3) return ["기사"  ,500,300 ,1  ,1]  //1~3
+    if(num2==4) return ["고블린",200,30  ,0.3,2]  //2~3
+    if(num2==5) return ["트롤"  ,250,30  ,0.2,2]  //2~5
+    if(num2==6) return ["마녀"  ,500,300 ,1  ,3]  //3~5
+    if(num2==7) return ["슬라임",700,300 ,1.5,4]  //4~5
+    if(num2==8) return ["사신"  ,700,1000,10 ,5]  //5
+  }
+  else{
+    if(num2==9) return ["아이스 드래곤"  ,5000  ,700  ,1.5,6]
+    if(num2==10) return ["파이어 드래곤"  ,5000  ,1000 ,2  ,6]
+    if(num2==11) return ["레전더리 드래곤",7000  ,1000 ,1  ,6]
+    if(num2==12) return ["골램"           ,25000 ,3000 ,3  ,1]
+    if(num2==13) return ["케르배우스"     ,10000 ,500  ,0.3,2]
+    if(num2==14) return ["마왕"           ,10000 ,3000 ,2.5,3]
+    if(num2==15) return ["악마"           ,15000 ,3500 ,2  ,4]
+    if(num2==16) return ["신"             ,100000,10000,0.1,5]
+  }
 }
 function inventorynum(num){
 //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
@@ -237,6 +288,7 @@ else if(num==35){
 
 function inventorymaterial(num){
 //필요돈,필요재료,겟수
+
 if(num==3){
   return [3000,27,10]
 }else if(num==4){
@@ -316,12 +368,97 @@ else if(num==18){
   return 200
 }
 }
+function maprandom(){
+  map=[[4,2]]
+  now=[4,2]
+  for(i=0;i<10;i++){
+    r=random(1,4)
+    if(r==1){
+      now[0]-=1
+    }else if(r==2){
+      if(now[1]!=4){
+        now[1]+=1
+        d=1
+        for(i=0;i<map.length;i++){
+          e=map[i].includes(now)
+          if(e){
+              d=0
+          }
+        }
+        if(d==0){
+          now[1]+=1
+          now[0]-=1
+        }
+      }
+      else{
+        now[0]-=1
+      }
+    }else{
+      if(now[1]!=0){
+        now[1]-=1
+        d=1
+        for(i=0;i<map.length;i++){
+          e=map[i].includes(now)
+          if(e){
+              d=0
+          }
+        }
+        if(d==0){
+          now[1]+=1
+          now[0]-=1
+        }
+      }
+      else{
+        now[0]-=1
+      }
+    }
 
+
+    map[map.length]=[[0,0]]
+    map[map.length-1][0]=now[0]
+    map[map.length-1][1]=now[1]
+
+
+  }
+
+  for(i=0;i<10;i++){
+    now[0]-=1
+    map[map.length]=[[0,0]]
+    map[map.length-1][0]=now[0]
+    map[map.length-1][1]=now[1]
+  }
+
+
+  return map
+}
+
+function mappr(map){
+  ml=map.length
+  mpr=""
+  for(i=0;i<5;i++){
+    if(i!=0){
+      mpr+="\n"
+    }
+    for(j=0;j<5;j++){
+      d=0
+      for(m=0;m<ml;m++){
+        if(map[m][0]==i && map[m][1]==j){
+          d=1
+        }
+      }
+      if(d){
+        mpr+=" 방 |"
+      }else{
+        mpr+="     |"
+      }
+    }
+    mpr+="\n--------------------------------"
+  }
+  return mpr
+}
 function inventorydefens(num){
 //원래 10000
-console.log("우주웅")
 if(num==7){
-  console.log("우주우주")
   return 15000
   
 }
@@ -560,11 +697,22 @@ function levelexp(lev){
     Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
     Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [17, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    Dinven.set(msg.author, [1, 35, 26, 32, 0, 0, 0, 0, 0, 0]);
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
     STmana.set(msg.author, 0);
-    dungeonCreated.set(msg.author, 1)
+    WaitingForAtack.set(msg.author, false);
+    Dequiped.set(msg.author, "미정");
+    EquippedSword.set(msg.author, 0);
+    dungeonCreated.set(msg.author, 1);
+  }
+  if(msg.content.startsWith(".d eq ")){
+    var pr = Number(msg.content.substring(6));
+    if(typeof(pr) == "number" && pr >= 1 && pr <= 16){
+      console.log(inventoryinformation(pr))
+      msg.channel.send(inventorynum(pr)[0] + "를 착용했습니다.")
+      Dequiped.set(msg.author, pr)
+      }
   }
   if(msg.content == ".d am"){
     if(Darmor.get(msg.author) >= 17 && Darmor.get(msg.author) <= 22){
@@ -590,9 +738,11 @@ function levelexp(lev){
     else{
       var ArmorStatus = "착용 안함"
     }
+    console.log(inventorynum(Dequiped.get(msg.author)))
     const ArmorEmbed = new Discord.MessageEmbed()
     .setTitle("갑옷 착용 명령어")
-    .setDescription("착용 중인 갑옷 : "+ArmorStatus)
+    .addField("착용 중인 갑옷 ",ArmorStatus, true)
+    .addField("착용 중인 무기 : ",String(inventorynum(Dequiped.get(msg.author))[0]))
     .addField(".d am1", "체력의 갑옷을 착용합니다.", true)
     .addField(".d am2", "마법사 갑옷을 착용합니다.", true)
     .addField(".d am3", "귀한 갑옷을 착용합니다.", true)
@@ -656,6 +806,34 @@ function levelexp(lev){
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
       }
   }
+  if(msg.content == ".d inv"){
+    var invenList = ""
+    for(var i = 0;i<=Dinven.get(msg.author).length - 1;i++){
+      if(Dinven.get(msg.author)[i] != 0 && typeof(Dinven.get(msg.author)[i]) != "undefined"){
+        invenList += "\n" + String(Number(i+1)+". " + inventorynum(Dinven.get(msg.author)[i])[0])
+        console.log(inventorynum(Dinven.get(msg.author)))
+    }
+    else{
+      invenList += "\n"+ String(Number(i+1)+". "+"비어 있음")
+  }}
+    msg.channel.send(invenList)
+  }
+  if(msg.content.startsWith(".d sl ")){
+    var content = Number(msg.content.substring(6)) - 1;
+    if(Dinven.get(msg.author)[content] != 0 && typeof(Dinven.get(msg.author)[content]) != "undefined"){
+      var inventory = Dinven.get(msg.author)
+      Dinven.set(msg.author, inventory)
+      var money = Dmoney.get(msg.author)
+      Dmoney.set(msg.author, money + (inventorynum(content))[2])
+      msg.channel.send(inventorynum(Dinven.get(msg.author)[content])[0] + "를 팔았습니다! \n" + inventorynum(content)[2] + "원을 벌었습니다!")
+      inventory[content] = 0
+    }}
+  if(msg.content == ".d at"){
+    if(WaitingForAtack.get(msg.author) == true){
+
+    }
+  }
+
   if (msg.content === '우돌') {
     msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
   }
@@ -749,7 +927,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 
 }
     if(msg.content == ".g"){
-      if(msg.author.username != "682358033937989632"){
+      if(msg.author.id != "682358033937989632"){
       const randomint = Math.floor(Math.random()*1000)
       if(randomint <= 1000){
         var prefix = "동전"
@@ -922,24 +1100,23 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     }
   }
   if(msg.content == ".d c"){
-    msg.channel.send(".d cb -> 버서커로 직업 변경")
-    msg.channel.send(".d ch -> 힐러로 직업 변경")
-    msg.channel.send(".d cw -> 메이지로 직업 변경")
-    msg.channel.send(".d ca -> 아처로 직업 변경")
-    msg.channel.send(".d ct -> 탱커로 직업 변경")
+    msg.channel.send(".d cb -> 버서커로 직업 변경\n.d ch -> 힐러로 직업 변경\n.d cw -> 메이지로 직업 변경\n.d ca -> 아처로 직업 변경\n.d ct -> 탱커로 직업 변경")
   }
   if(msg.content == ".d mt"){
     const StoreEmbed = new Discord.MessageEmbed()
     .setTitle("무기상점")
     .setColor("#73F2F0")
     .setDescription("상점 도움말입니다.")
-    .addField(".bmt", "버서커 상점입니다.")
-    .addField(".hmt", "힐러 상점입니다.")
-    .addField(".wmt", "메이지 상점입니다.")
-    .addField(".amt", "아처 상점입니다.")
-    .addField(".tmt", "탱커 상점입니다.")
+    .addField(".cmt", "전투 상점입니다.")
     .addField(".imt", "아이템 상점입니다.")
     msg.channel.send(StoreEmbed);
+  }
+  if(msg.content == ".d cmt"){
+    const CombatStoreEmbed1 = new Discord.MessageEmbed()
+    .setTitle("전투상점   «0-1»")
+    .setDescription("전투 관련 상점입니다.")
+    .addField(inventorynum(1)[0], "가격 : " + (inventorymaterial(1))[0]+"\n" + "재료 : " + (inventorymaterial(1))[1] + " x "+(inventorymaterial(1))[2])
+    msg.channel.send(CombatStoreEmbed1)
   }
   if(msg.content == ".d cb"){
     msg.channel.send("직업을 버서커로 바꿨습니다.")
