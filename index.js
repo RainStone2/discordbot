@@ -137,7 +137,8 @@ const Sexp = new Map();
 const WaitingForAtack = new Map();
 const EquippedSword = new Map();
 const Dequiped = new Map();
-
+const DinvenCount = new Map();
+const materialReady = new Map();
 const Hlevel = new Map();
 const Hexp = new Map();
 
@@ -162,8 +163,10 @@ function random(small, big) {
 function inventoryFind(num, UserInven){
   for(var index = 0; index < UserInven.length + 1; index++){
     if(UserInven[index] == num){
-      console.log(index)
       return index;
+    }
+    else{
+      return "false";
     }
   }
 
@@ -431,7 +434,6 @@ function maprandom(){
 
   return map
 }
-
 function mappr(map){
   ml=map.length
   mpr=""
@@ -697,7 +699,8 @@ function levelexp(lev){
     Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
     Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [1, 35, 26, 32, 0, 0, 0, 0, 0, 0]);
+    Dinven.set(msg.author, [1, 35, 26, 32, 28, 0, 0, 0, 0, 0]);
+    DinvenCount.set(msg.author, [1, 1, 1, 1, 13, 0, 0, 0, 0, 0])
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
     STmana.set(msg.author, 0);
@@ -705,6 +708,7 @@ function levelexp(lev){
     Dequiped.set(msg.author, "미정");
     EquippedSword.set(msg.author, 0);
     dungeonCreated.set(msg.author, 1);
+    materialReady.set(msg.author, false)
   }
   if(msg.content.startsWith(".d eq ")){
     var pr = Number(msg.content.substring(6));
@@ -738,7 +742,7 @@ function levelexp(lev){
     else{
       var ArmorStatus = "착용 안함"
     }
-    console.log(inventorynum(Dequiped.get(msg.author)))
+    
     const ArmorEmbed = new Discord.MessageEmbed()
     .setTitle("갑옷 착용 명령어")
     .addField("착용 중인 갑옷 ",ArmorStatus, true)
@@ -752,7 +756,7 @@ function levelexp(lev){
     msg.channel.send(ArmorEmbed)
   }
   if(msg.content == ".d am1"){
-    if(inventoryFind(17, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(17) >= 0){
     msg.channel.send("체력의 갑옷을 착용했습니다.")
     Darmor.set(msg.author, 17)
     }
@@ -761,7 +765,7 @@ function levelexp(lev){
     }
   }
   if(msg.content == ".d am2"){
-    if(inventoryFind(18, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(18) >= 0){
       msg.channel.send("마법사 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 18)
       }
@@ -770,7 +774,7 @@ function levelexp(lev){
       }
   }
   if(msg.content == ".d am3"){
-    if(inventoryFind(19, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(19) >= 0){
       msg.channel.send("귀한 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 19)
       }
@@ -779,7 +783,7 @@ function levelexp(lev){
       }
   }
   if(msg.content == ".d am4"){
-    if(inventoryFind(20, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(20) >= 0){
       msg.channel.send("철제의 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 20)
       }
@@ -788,7 +792,7 @@ function levelexp(lev){
       }
   }
   if(msg.content == ".d am5"){
-    if(inventoryFind(21, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(21) >= 0){
       msg.channel.send("다이아 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 21)
       }
@@ -797,7 +801,7 @@ function levelexp(lev){
       }
   }
   if(msg.content == ".d am6"){
-    if(inventoryFind(22, Dinven.get(msg.author)) >= 0){
+    if(Dinven.get(msg.author).indexOf(22) >= 0){
       msg.channel.send("전설의 갑옷을 착용했습니다.")
       Dinven.get(msg.author)  
       Darmor.set(msg.author, 22)
@@ -810,8 +814,8 @@ function levelexp(lev){
     var invenList = ""
     for(var i = 0;i<=Dinven.get(msg.author).length - 1;i++){
       if(Dinven.get(msg.author)[i] != 0 && typeof(Dinven.get(msg.author)[i]) != "undefined"){
-        invenList += "\n" + String(Number(i+1)+". " + inventorynum(Dinven.get(msg.author)[i])[0])
-        console.log(inventorynum(Dinven.get(msg.author)))
+        invenList += "\n" + String(Number(i+1)+". " + inventorynum(Dinven.get(msg.author)[i])[0] + ", " + DinvenCount.get(msg.author)[i]+ "개")
+        
     }
     else{
       invenList += "\n"+ String(Number(i+1)+". "+"비어 있음")
@@ -1115,9 +1119,68 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     const CombatStoreEmbed1 = new Discord.MessageEmbed()
     .setTitle("전투상점   «0-1»")
     .setDescription("전투 관련 상점입니다.")
-    .addField(inventorynum(1)[0], "가격 : " + (inventorymaterial(1))[0]+"\n" + "재료 : " + (inventorymaterial(1))[1] + " x "+(inventorymaterial(1))[2])
+    .addField(inventorynum(1)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(2)[0], "가격 : " + (inventorynum(2))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(3)[0], "가격 : " + (inventorymaterial(3))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(3))[1])[0] + " x "+(inventorymaterial(3))[2],true)
+    .addField(inventorynum(4)[0], "가격 : " + (inventorymaterial(4))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(4))[1])[0] + " x "+(inventorymaterial(4))[2],true)
+    .addField(inventorynum(5)[0], "가격 : " + (inventorymaterial(5))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(5))[1])[0] + " x "+(inventorymaterial(5))[2],true)
+    .addField(inventorynum(6)[0], "가격 : " + (inventorymaterial(6))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(6))[1])[0] + " x "+(inventorymaterial(6))[2], true)
+    .addField(inventorynum(10)[0], "가격 : " + (inventorymaterial(10))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(10))[1])[0] + " x "+(inventorymaterial(10))[2],true)
+    .addField(inventorynum(11)[0], "가격 : " + (inventorymaterial(11))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(11))[1])[0] + " x "+(inventorymaterial(11))[2],true)
+    .addField(inventorynum(13)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(14)[0], "가격 : " + (inventorymaterial(14))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(14))[1])[0] + " x "+(inventorymaterial(14))[2], true)
+    .addField(inventorynum(15)[0], "가격 : " + (inventorymaterial(15))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(15))[1])[0] + " x "+(inventorymaterial(15))[2], true)
+    .addField(inventorynum(16)[0], "가격 : " + (inventorynum(16))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(17)[0], "가격 : " + (inventorynum(17))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(18)[0], "가격 : " + (inventorynum(18))[2] + "\n재료 : 필요 없음", true)
+    .addField(inventorynum(20)[0], "가격 : " + (inventorymaterial(20))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(20))[1])[0] + " x "+(inventorymaterial(20))[2],true)
+    .addField(inventorynum(21)[0], "가격 : " + (inventorymaterial(21))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(21))[1])[0] + " x "+(inventorymaterial(21))[2],true)
+    .addField(inventorynum(22)[0], "가격 : " + (inventorymaterial(22))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(22))[1])[0] + " x "+(inventorymaterial(22))[2],true)
     msg.channel.send(CombatStoreEmbed1)
   }
+  if(msg.content == ".d imt"){
+    const StoreEmbed2 = new Discord.MessageEmbed()
+    .setTitle("전투상점   «1-1»")
+    .setDescription("포션 상점입니다.")
+    .addField(inventorynum(23)[0],"가격 : "+inventorynum(23)[2],true)
+    .addField(inventorynum(24)[0],"가격 : "+inventorynum(24)[2],true)
+    .addField(inventorynum(25)[0],"가격 : "+inventorynum(25)[2],true)
+    msg.channel.send(StoreEmbed2)
+  }
+  if(msg.content.startsWith(".d b ")){
+    var inventory = Dinven.get(msg.author)
+    var marketmsg = msg.content.split(" ")
+    if(inventorynum(Number(marketmsg[2]))[3] == 1 && Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37 && inventorynum(marketmsg[2])[4] == 1){
+      if(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory) != "false"){
+        var materialIndex = inventory.indexOf(inventorymaterial(marketmsg[2])[2])
+        var pastCount = invenCount[materialIndex]
+        if(invenCount[materialIndex] - inventorymaterial(marketmsg[2])[2] >= 0){
+          invenCount[materialIndex] = pastCount - inventorymaterial(marketmsg[2])[2]
+        materialReady.set(msg.author, true) 
+        }
+      }
+    }
+    else if(inventorynum(Number(marketmsg[2]))[3] == 0 && Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37 && inventorynum(marketmsg[2])[4] == 0){
+      materialReady.set(msg.author, true)
+    }
+    if(materialReady.get(msg.author) == true){
+    var Currentmoney = Dmoney.get(msg.author)
+      Dmoney.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
+      var inventory = Dinven.get(msg.author)
+      if(inventoryFind(marketmsg[2], inventory) == "false"){
+      DinvenIndex = inventory.indexOf(0)
+      }
+      else{
+        DinvenIndex = inventoryFind(marketmsg[2], inventory)
+      }
+      inventory[DinvenIndex] = Number(marketmsg[2])
+      Dinven.set(msg.author, inventory)
+      var invenCount = DinvenCount.get(msg.author)
+      var itemCount = invenCount[DinvenIndex]
+      invenCount[DinvenIndex] = itemCount + 1
+      DinvenCount.set(msg.author, invenCount)
+      msg.channel.send(inventorynum(marketmsg[2])[0] + "를 샀습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
+     }}
   if(msg.content == ".d cb"){
     msg.channel.send("직업을 버서커로 바꿨습니다.")
     hp = Dhp.get(msg.author)
@@ -1155,11 +1218,17 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     Dhp.set(msg.author, hp*2)
     Djob.set(msg.author, 5)
   }
-  
+  if(msg.content == ".d sd"){
+    msg.channel.send(mappr(maprandom()))
+  }
   if (msg.content === '제작자') {
     msg.reply('https://discord.gg/pcsMCJBj3S에서 제작자를 만나보세요!');
   }
-  
+  if(msg.content.startsWith("랜덤")){
+    const random = Math.floor(Math.random() * 2);
+    List = ["턴제", "쿨타임"]
+    msg.channel.send(List[random])
+  }
     
     if(msg.content.startsWith('-shout')){
       const str1 = msg.content;
@@ -1243,7 +1312,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         if(msg.content.startsWith("&")){
         const playermessage = msg.content
         const playerresult = playermessage.substring(1)
-        console.log(playerresult)
         const playermessageresult = Number(playerresult)
           if(playermessageresult === questionmap.get(msg.author)){
           msg.reply("정답입니다!")
@@ -1265,7 +1333,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
             rmap.set(msg.author, rn1 * rn2)
           }
-            console.log(rn1 * rn2)
+            
           if(rindex === 1){
             msg.reply(rn1 + " / " + rn2)
             msg.reply("= ? ")
@@ -1273,27 +1341,27 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             msg.reply("소수점으로 내려갈 가능성이 다수이니 1의 자리로 버림해 주세요")
             rmap.set(msg.author, parseInt(rn1 / rn2))
           }
-            console.log(parseInt(rn1 / rn2))
+            
           if(rindex === 2){
             msg.reply(rn1 + " + " + rn2)
             msg.reply("= ? ")
             msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
             rmap.set(msg.author, rn1 + rn2)
           }
-            console.log(rn1 + rn2)
+            
           if(rindex === 3){
             msg.reply(rn1 + " - " + rn2)
             msg.reply("= ? ")
             msg.reply("정답을 입력하기 전에 #를 입력해 주세요! EX : #77, #28")
             rmap.set(msg.author, rn1 - rn2)
-            console.log(rn1 - rn2)
+            
           }
        
             }
             if(msg.content.startsWith("#")){
               const rplayermessage = msg.content
               const rplayerresult = rplayermessage.substring(1)
-              console.log(rplayerresult)
+              
               const rplayermessageresult = Number(rplayerresult)
                 if(rplayermessageresult === rmap.get(msg.author)){
                 msg.reply("정답입니다!")  
@@ -1491,22 +1559,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           }
           const packageJSON = require("./package.json");
 
-client.on("messageCreate", async (message) => {
 
-    if (message.author.bot) return;
-
-    if (message.content == "!stats") {
-        const discordJSVersion = packageJSON.dependencies["discord.js"];
-        const embed = new Discord.MessageEmbed()
-            .setColor("RANDOM")
-            .setTitle(`Bot stats - ${client.user.tag}`)
-            .addField("Discord.js version", discordJSVersion);
-        message.channel.send({
-            embeds: [embed]
-        });
-    }
-    
-});
       
 
 
