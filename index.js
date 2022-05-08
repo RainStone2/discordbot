@@ -164,11 +164,9 @@ function inventoryFind(num, UserInven){
   for(var index = 0; index < UserInven.length + 1; index++){
     if(UserInven[index] == num){
       return index;
-    }
-    else{
-      return "false";
-    }
+    } 
   }
+  return "false";
 
 }
 function monster_information(num1,num2){
@@ -290,7 +288,7 @@ else if(num==35){
 }
 
 function inventorymaterial(num){
-//필요돈,필요재료,겟수
+//필요돈,필요재료,갯수
 
 if(num==3){
   return [3000,27,10]
@@ -1147,26 +1145,65 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField(inventorynum(25)[0],"가격 : "+inventorynum(25)[2],true)
     msg.channel.send(StoreEmbed2)
   }
-  if(msg.content.startsWith(".d b ")){
+  if(msg.content.startsWith(".d c ")){
     var inventory = Dinven.get(msg.author)
     var marketmsg = msg.content.split(" ")
-    if(inventorynum(Number(marketmsg[2]))[3] == 1 && Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37 && inventorynum(marketmsg[2])[4] == 1){
+    var invenCount = DinvenCount.get(msg.author)
+    if(inventorynum(Number(marketmsg[2]))[3] == 0){
+    if(Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37 && inventorynum(marketmsg[2])[4] == 1){
+      console.log(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory))
+      console.log(inventorymaterial(marketmsg[2])[1])
+      console.log(inventorymaterial(marketmsg[2]))
       if(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory) != "false"){
-        var materialIndex = inventory.indexOf(inventorymaterial(marketmsg[2])[2])
+        var materialIndex = inventory.indexOf(inventorymaterial(marketmsg[2])[1])
         var pastCount = invenCount[materialIndex]
         if(invenCount[materialIndex] - inventorymaterial(marketmsg[2])[2] >= 0){
           invenCount[materialIndex] = pastCount - inventorymaterial(marketmsg[2])[2]
         materialReady.set(msg.author, true) 
         }
       }
-    }
-    else if(inventorynum(Number(marketmsg[2]))[3] == 0 && Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37 && inventorynum(marketmsg[2])[4] == 0){
+        else{
+          msg.channel.send("재료가 부족한 것 같네요.")
+        }
+      }
+      if(materialReady.get(msg.author) == true){
+        var Currentmoney = Dmoney.get(msg.author)
+    if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
+        var Currentmoney = Dmoney.get(msg.author)
+        Dmoney.set(msg.author, Currentmoney - inventorymaterial(marketmsg[2])[0])
+        var inventory = Dinven.get(msg.author)
+        if(inventoryFind(marketmsg[2], inventory) == "false"){
+        DinvenIndex = inventory.indexOf(0)
+        }
+        else{
+          DinvenIndex = inventoryFind(marketmsg[2], inventory)
+        }
+        inventory[DinvenIndex] = Number(marketmsg[2])
+        Dinven.set(msg.author, inventory)
+        var invenCount = DinvenCount.get(msg.author)
+        var itemCount = invenCount[DinvenIndex]
+        invenCount[DinvenIndex] = itemCount + 1
+        DinvenCount.set(msg.author, invenCount)
+        msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
+       }
+     else{
+       msg.channel.send("돈이 부족합니다.")
+      }}
+      }
+  }
+  if(msg.content.startsWith(".d b ")){
+    var inventory = Dinven.get(msg.author)
+    var marketmsg = msg.content.split(" ")
+    var invenCount = DinvenCount.get(msg.author)
+    if(inventorynum(Number(marketmsg[2]))[3] == 0 && Number(marketmsg[2]) >= 1 && Number(marketmsg[2]) <= 37){
       materialReady.set(msg.author, true)
     }
     if(materialReady.get(msg.author) == true){
+    
     var Currentmoney = Dmoney.get(msg.author)
-      Dmoney.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
-      var inventory = Dinven.get(msg.author)
+    if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
+    Dmoney.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
+    var inventory = Dinven.get(msg.author)
       if(inventoryFind(marketmsg[2], inventory) == "false"){
       DinvenIndex = inventory.indexOf(0)
       }
@@ -1180,7 +1217,13 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       invenCount[DinvenIndex] = itemCount + 1
       DinvenCount.set(msg.author, invenCount)
       msg.channel.send(inventorynum(marketmsg[2])[0] + "를 샀습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
-     }}
+    }
+    else{
+      msg.channel.send("돈이 부족합니다.")
+    }
+  }
+    
+    }
   if(msg.content == ".d cb"){
     msg.channel.send("직업을 버서커로 바꿨습니다.")
     hp = Dhp.get(msg.author)
