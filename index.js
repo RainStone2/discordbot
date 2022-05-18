@@ -1,3 +1,4 @@
+global.g_money = 1
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.on('ready', () => {
@@ -18,17 +19,19 @@ const { deepStrictEqual } = require('assert');
 const { constants } = require('buffer');
 const Discord = require('discord.js');
 const fs = require('fs');
-const mysql = require('mysql');
-const sql = require('./sql.js');
-const pool = mysql.createPool({
-  connectionLimit : 10,
-  prot : 3306,
-  host : '127.0.0.1',
-  user : 'RainStone2',
-  password : 'RainStone2',
-  database : 'bot_playerinfo'
-});
-const { getgid } = require('process');
+const mysql = require('mysql');  // mysql 모듈 로드
+const { getgid, exit } = require('process');
+const conn = {  // mysql 접속 설정
+    host: 'localhost',
+    port: '3306',
+    user: 'RainStone2',
+    password: '1234',
+    database: 'playerinfo'
+};
+ 
+
+var connection = mysql.createConnection(conn); // DB 커넥션 생성
+connection.connect();   // DB 접속
 const { fileURLToPath } = require('url');
 //const client = new Discord.Client();
 const https = require('https');
@@ -128,6 +131,8 @@ const Dhp = new Map();
 const Dmg = new Map();
 const Dmana = new Map();
 const Darmor = new Map();
+const Defense = new Map();
+const ArmDef = new Map();
 const SThp = new Map();
 const STdmg = new Map();
 const STmana = new Map();
@@ -141,7 +146,7 @@ const DinvenCount = new Map();
 const materialReady = new Map();
 const Hlevel = new Map();
 const Hexp = new Map();
-
+const Dmap = new Map()
 const Wlevel = new Map();
 const Wexp = new Map();
 
@@ -169,31 +174,96 @@ function inventoryFind(num, UserInven){
   return "false";
 
 }
+function random(small, big) {
+    return Math.floor(Math.random() * (big - small)) + small;
+}
+
 function monster_information(num1,num2){
-
-  //이름,체력,데미지,쿨타임,스테이지
-
+  
+  //이름,체력,데미지,쿨타임,스테이지↓,스테이지↑
+  /*
   if(num1==1){
-    if(num2==1) return ["해골"  ,300,100 ,2  ,1]  //1
-    if(num2==2) return ["맷돼지",500,500 ,3  ,1]  //1~2
-    if(num2==3) return ["기사"  ,500,300 ,1  ,1]  //1~3
-    if(num2==4) return ["고블린",200,30  ,0.3,2]  //2~3
-    if(num2==5) return ["트롤"  ,250,30  ,0.2,2]  //2~5
-    if(num2==6) return ["마녀"  ,500,300 ,1  ,3]  //3~5
-    if(num2==7) return ["슬라임",700,300 ,1.5,4]  //4~5
-    if(num2==8) return ["사신"  ,700,1000,10 ,5]  //5
+    if(num2==1) return ["해골"  ,300 ,100 ,2  ,1,1]  //1
+    if(num2==2) return ["맷돼지",500 ,500 ,3  ,1,2]  //1~2
+    if(num2==3) return ["기사"  ,500 ,300 ,1  ,1,3]  //1~3
+    if(num2==4) return ["고블린",200 ,30  ,0.3,2,3]  //2~3
+    if(num2==5) return ["트롤"  ,250 ,30  ,0.2,2,4]  //2~5
+    if(num2==6) return ["마녀"  ,500 ,300 ,1  ,3,5]  //3~5
+    if(num2==7) return ["슬라임",700 ,300 ,1.5,4,5]  //4~5
+    if(num2==8) return ["골램"  ,2000,100 ,5  ,4,5]  //4~5
+    if(num2==9) return ["사신"  ,700 ,1000,10 ,5,5]  //5
   }
   else{
-    if(num2==9) return ["아이스 드래곤"  ,5000  ,700  ,1.5,6]
-    if(num2==10) return ["파이어 드래곤"  ,5000  ,1000 ,2  ,6]
-    if(num2==11) return ["레전더리 드래곤",7000  ,1000 ,1  ,6]
-    if(num2==12) return ["골램"           ,25000 ,3000 ,3  ,1]
-    if(num2==13) return ["케르배우스"     ,10000 ,500  ,0.3,2]
-    if(num2==14) return ["마왕"           ,10000 ,3000 ,2.5,3]
-    if(num2==15) return ["악마"           ,15000 ,3500 ,2  ,4]
-    if(num2==16) return ["신"             ,100000,10000,0.1,5]
+    if(num2==1) return ["아이스 드래곤"  ,5000  ,700  ,1.5,6]
+    if(num2==2) return ["파이어 드래곤"  ,5000  ,1000 ,2  ,6]
+    if(num2==3) return ["레전더리 드래곤",7000  ,1000 ,1  ,6]
+    if(num2==4) return ["골램"           ,25000 ,3000 ,3  ,1]
+    if(num2==5) return ["케르배우스"     ,10000 ,500  ,0.3,2]
+    if(num2==6) return ["마왕"           ,10000 ,3000 ,2.5,3]
+    if(num2==7) return ["악마"           ,15000 ,3500 ,2  ,4]
+    if(num2==8) return ["신"             ,100000,10000,0.1,5]
+  }
+  */
+  if(num1==1){
+    if(num2==1) return ["해골"  ,300 ,500 ,1,1]  //1
+    if(num2==2) return ["맷돼지",1000,100 ,1,2]  //1~2
+    if(num2==3) return ["기사"  ,700 ,300 ,1,3]  //1~3
+    if(num2==4) return ["고블린",100 ,500 ,2,3]  //2~3
+    if(num2==5) return ["트롤"  ,50  ,700 ,2,3]  //2~5
+    if(num2==6) return ["마녀"  ,1500,500 ,2,5]  //3~5
+    if(num2==7) return ["슬라임",2000,700 ,4,5]  //4~5
+    if(num2==8) return ["골램"  ,5000,100 ,4,5]  //4~5
+    if(num2==9) return ["사신"  ,500 ,3000,5,5]  //5
+  }
+  else{
+    if(num2==1) return ["아이스 드래곤"  ,15000 ,3000 ,6]
+    if(num2==2) return ["파이어 드래곤"  ,10000 ,5000 ,6]
+    if(num2==3) return ["레전더리 드래곤",15000 ,5000 ,6]
+    if(num2==4) return ["골램"           ,15000 ,500  ,1]
+    if(num2==5) return ["케르배우스"     ,10000 ,2000 ,2]
+    if(num2==6) return ["마왕"           ,15000 ,2000 ,3]
+    if(num2==7) return ["악마"           ,15000 ,3500 ,4]
+    if(num2==8) return ["신"             ,100000,10000,5]
   }
 }
+
+function numtoname(a){
+  al=a.length
+  b=[]
+  b[0]=""
+    c=monster_information(1,a[0])
+    b[0]=c[0]
+  for(p=1;p<al;p++){
+    b[p]=""
+    c=monster_information(1,a[p])
+    b[p]=c[0]
+  }
+  
+  return b
+}
+
+
+let output
+const setOutput = (rows) => {
+  output = rows;
+  console.log(output);
+}
+function RunSql(testQuery){
+  console.log(testQuery)
+  connection.query(testQuery, function (err, results, fields) { // testQuery 실행
+    if (err) {
+        console.log(err);
+    }
+    
+    console.log("result : " + results);
+    return results
+  });
+}
+
+function RunSqlWithFunction(testQuery, fnct) {
+  connection.query(testQuery, fnct)
+  
+  };
 function inventorynum(num){
 //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
 if(num==1){
@@ -369,93 +439,243 @@ else if(num==18){
   return 200
 }
 }
-function maprandom(){
+function mapmonstar(stage){
+  rmli=[]
+  rm=[]
+  for(i=1;i<10;i++){
+  mi=monster_information(1,i)
+   mi0=mi[0]
+   mi4=mi[3]
+   mi5=mi[4]
+    if(stage>=mi4 && stage<=mi5){
+      rmli[rmli.length]=i
+    }
+  }
+  for(i=0;i<5;i++){
+    r=random(0,rmli.length)
+    rm[rm.length]=rmli[r]
+  }
+  return rm
+}
+
+
+//1 잔몹:해골,맷돼지,기사,고블린,트롤,마녀,슬라임,사신
+//2 보스:아이스 드래곤,파이어 드래곤,레전더리 드래곤,골램,케르베로스,마왕,악마,신
+function maprandom(stage){
+  //현재는 5스테이지 까지
   map=[[4,2]]
   now=[4,2]
-  for(i=0;i<10;i++){
-    r=random(1,4)
-    if(r==1){
+  mon=[]
+  pos=[4,2]
+    
+    mm=mapmonstar(stage)
+    mon[0]=mm
+  for(k=0;k<50;k++){
+    r=random(1,9)
+    d=0
+    if(r<3){
+      d=1
       now[0]-=1
-    }else if(r==2){
+    }else if(r<6){
+      
       if(now[1]!=4){
         now[1]+=1
-        d=1
-        for(i=0;i<map.length;i++){
-          e=map[i].includes(now)
-          if(e){
-              d=0
+        a=0
+        ml=map.length
+        for(i=0;i<ml;i++){
+          if(now[0]==map[i][0]){
+            if(now[1]==map[i][1]){
+              a=1
+            }
           }
         }
-        if(d==0){
-          now[1]+=1
-          now[0]-=1
+        if(!a){
+        d=1
+        }
+        else{
+        now[1]-=1
+          d=0
         }
       }
+      /*
       else{
-        now[0]-=1
+        now[1]-=1
       }
+      */
     }else{
       if(now[1]!=0){
         now[1]-=1
-        d=1
-        for(i=0;i<map.length;i++){
-          e=map[i].includes(now)
-          if(e){
-              d=0
+        a=0
+        ml=map.length
+        for(i=0;i<ml;i++){
+          if(now[0]==map[i][0]){
+            if(now[1]==map[i][1]){
+              a=1
+            }
           }
         }
-        if(d==0){
-          now[1]+=1
-          now[0]-=1
+        if(!a){
+        d=1
+        }
+        else{
+        now[1]+=1
+          d=0
         }
       }
+      /*
       else{
-        now[0]-=1
+        now[1]+=1
       }
+      */
     }
-
-
-    map[map.length]=[[0,0]]
+    if(d){
+    mm=mapmonstar(stage);
+    //mon[mon.length]=[]
+    mon[mon.length]=mm;
+    map[map.length]=[[]]
     map[map.length-1][0]=now[0]
     map[map.length-1][1]=now[1]
-
-
+    }
   }
-
-  for(i=0;i<10;i++){
-    now[0]-=1
-    map[map.length]=[[0,0]]
-    map[map.length-1][0]=now[0]
-    map[map.length-1][1]=now[1]
-  }
-
-
-  return map
+return map
 }
-function mappr(map){
-  ml=map.length
+function mappr(map,pos){
   mpr=""
+  ml=map.length
   for(i=0;i<5;i++){
     if(i!=0){
       mpr+="\n"
     }
+    mpr+="-----------------------------------\n|"
     for(j=0;j<5;j++){
       d=0
-      for(m=0;m<ml;m++){
-        if(map[m][0]==i && map[m][1]==j){
+      for(k=0;k<ml;k++){
+        if(map[k][0]==i && map[k][1]==j){
           d=1
+          pp=k+1
         }
       }
-      if(d){
-        mpr+=" 방 |"
-      }else{
-        mpr+="     |"
+      
+      
+      jj=0
+      if(pos[0]==i && pos[1]==j) jj=1
+      
+      if(!d){
+        mpr+="      |"
+      }
+      else{
+        if(jj){
+          mpr+="  p  |"
+        }
+        else{
+          if(10>pp){
+            mpr+="  "+pp+"  |"
+          }
+          else{
+            mpr+=" "+pp+"  |"
+          }
+        }
       }
     }
-    mpr+="\n--------------------------------"
   }
+  mpr+="\n-----------------------------------"
+  //return pos
   return mpr
 }
+function mapinformation(){
+  j=0
+  for(i=0;i<100;i++){
+    if(now[0]==map[0]){
+      if(now[1]==map[1]){
+        
+      }
+    }
+  }
+  return [mon[j]]
+}
+function move_show(msg,map,pos){
+  if(msg=="ms") return pos
+  if(msg=="mi") return (mappr(map,pos))
+  if(msg=="mp") {
+    for(m=0;m<ml;m++){
+        if(map[m][0]==pos[0] && map[m][1]==pos[1]){
+        a=1
+        mmm=m
+      }
+    }
+    return ("위치:"+(mmm+1)+"번 방\n몬스터:"+numtoname(mon[mmm]))
+  }
+  if(msg=="w"){
+    a=0
+    ml=map.length
+    for(m=0;m<ml;m++){
+        if(map[m][0]==pos[0]-1 && map[m][1]==pos[1]){
+        a=1
+        mmm=m
+      }
+    }
+    if(a){
+      pos[0]--
+      return ("앞으로 갔습니다")
+    }
+    else{
+      return ("앞에 아무것도 없습니다")
+    }
+  }
+  if(msg=="a"){
+    a=0
+    ml=map.length
+    for(m=0;m<ml;m++){
+        if(map[m][0]==pos[0] && map[m][1]==pos[1]-1){
+        a=1
+        mmm=m
+      }
+    }
+    if(a){
+      pos[1]--
+      return ("왼쪽으로 갔습니다")
+    }
+    else{
+      return ("왼쪽에 아무것도 없습니다")
+    }
+  }
+  if(msg=="s"){
+    a=0
+    ml=map.length
+    for(m=0;m<ml;m++){
+        if(map[m][0]==pos[0]+1 && map[m][1]==pos[1]){
+        a=1
+        mmm=m
+      }
+    }
+    if(a){
+      pos[0]++
+      return ("아래으로 갔습니다")
+    }
+    else{
+      return ("아래에 아무것도 없습니다")
+    }
+  }
+  if(msg=="d"){
+    a=0
+    ml=map.length
+    for(m=0;m<ml;m++){
+        if(map[m][0]==pos[0] && map[m][1]==pos[1]+1){
+        a=1
+        mmm=m
+      }
+    }
+    if(a){
+      pos[1]++
+      return ("오른쪽으로 갔습니다")
+    }
+    else{
+      return ("오른쪽에 아무것도 없습니다")
+    }
+  }
+  return 0
+}
+
 function inventorydefens(num){
 //원래 10000
 if(num==7){
@@ -668,7 +888,7 @@ function levelexp(lev){
     return 10000
   }
 }
-  
+
    client.on('message', msg => {
   if(accountCreated.get(msg.author) != true){
     moneymap.set(msg.author, 0)
@@ -685,7 +905,9 @@ function levelexp(lev){
     Dhp.set(msg.author, 1000);
     Dmg.set(msg.author, 200);
     Dmana.set(msg.author, 100);
-    Dstat.set(msg.author, 3)
+    Dstat.set(msg.author, 3);
+    Defense.set(msg.author, 1000);
+    ArmDef.set(msg.author, 0)
     Darmor.set(msg.author, 0)
     Slevel.set(msg.author, 1);
     Sexp.set(msg.author, 0);
@@ -697,8 +919,8 @@ function levelexp(lev){
     Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
     Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [1, 35, 26, 32, 28, 0, 0, 0, 0, 0]);
-    DinvenCount.set(msg.author, [1, 1, 1, 1, 13, 0, 0, 0, 0, 0])
+    Dinven.set(msg.author, [1, 35, 26, 32, 28, 20, 0, 0, 0, 0]);
+    DinvenCount.set(msg.author, [1, 1, 1, 1, 13, 1, 0, 0, 0, 0])
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
     STmana.set(msg.author, 0);
@@ -707,6 +929,16 @@ function levelexp(lev){
     EquippedSword.set(msg.author, 0);
     dungeonCreated.set(msg.author, 1);
     materialReady.set(msg.author, false)
+    console.log(msg.author.id)
+    
+    testQuery = "INSERT INTO `member` (`id`, `money`, `earning`, `percent`) VALUES (" + String(msg.author.id) + ", 0, 1, 1);";
+    
+  connection.query(testQuery, function (err, results, fields) { // testQuery 실행
+      if (err) {
+          console.log(err);
+      }
+      console.log(results);
+});
   }
   if(msg.content.startsWith(".d eq ")){
     var pr = Number(msg.content.substring(6));
@@ -757,6 +989,7 @@ function levelexp(lev){
     if(Dinven.get(msg.author).indexOf(17) >= 0){
     msg.channel.send("체력의 갑옷을 착용했습니다.")
     Darmor.set(msg.author, 17)
+    ArmDef.set(inventoryDurability(17))
     }
     else{
       msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -766,6 +999,7 @@ function levelexp(lev){
     if(Dinven.get(msg.author).indexOf(18) >= 0){
       msg.channel.send("마법사 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 18)
+      ArmDef.set(inventoryDurability(18))
       }
       else{
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -775,6 +1009,7 @@ function levelexp(lev){
     if(Dinven.get(msg.author).indexOf(19) >= 0){
       msg.channel.send("귀한 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 19)
+      ArmDef.set(inventoryDurability(19))
       }
       else{
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -784,6 +1019,8 @@ function levelexp(lev){
     if(Dinven.get(msg.author).indexOf(20) >= 0){
       msg.channel.send("철제의 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 20)
+      ArmDef.set(inventoryDurability(20))
+      console.log(ArmDef.get(msg.author))
       }
       else{
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -793,6 +1030,7 @@ function levelexp(lev){
     if(Dinven.get(msg.author).indexOf(21) >= 0){
       msg.channel.send("다이아 갑옷을 착용했습니다.")
       Darmor.set(msg.author, 21)
+      ArmDef.set(inventoryDurability(21))
       }
       else{
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -803,6 +1041,7 @@ function levelexp(lev){
       msg.channel.send("전설의 갑옷을 착용했습니다.")
       Dinven.get(msg.author)  
       Darmor.set(msg.author, 22)
+      ArmDef.set(inventoryDurability(22))
       }
       else{
         msg.channel.send("당신에 인벤토리에 해당 갑옷은 없습니다!")
@@ -835,7 +1074,25 @@ function levelexp(lev){
 
     }
   }
-
+  if(msg.content == ".d mi" || msg.content == ".d mp" || msg.content == ".d ms"){
+    var stage=5
+    console.log(maprandom(5))
+    var msgSub = msg.content.substring(3)
+    console.log(msgSub)
+    mm=move_show(msgSub,map,pos)
+      if(mm!=0){
+        msg.channel.send(mm)
+      }
+  }
+  else if(msg.content == "w" || msg.content == "s" || msg.content == "a" || msg.content == "d"){
+    var stage=5
+    var mcontent = msg.content 
+      mm=move_show(mcontent,map,pos)
+      if(mm!=0){
+        msg.channel.send(mm)
+        msg.channel.send()
+      }
+  }
   if (msg.content === '우돌') {
     msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
   }
@@ -955,27 +1212,70 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       msg.channel.send(prefix + "을(를) 발견했습니다! " + earningmap.get(msg.author) * Number(multiple) + "원을 벌었습니다!")
       lastmoney = Number(moneymap.get(msg.author));
       moneymap.set(msg.author, lastmoney += 1 * Number(multiple));
-      console.log(moneymap.get(msg.author))
+      RunSqlWithFunction('Update `member` set `money` = `money` + ' + earningmap.get(msg.author) * Number(multiple) +  ' where id = ' + msg.author.id,
+      function(err, results, fields) {
+        
+      }
+      )
+    }
+
+    if(msg.content == ".s"){
+      g_money = 2
+      console.log("under 2:"+g_money)
+      RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '" order by `money` desc limit 1', 
+        function(err, results, fields) {
+          g_money = results[0].money 
+          msg.channel.send("당신에게는 " + g_money + "원이 있습니다!");
+          console.log("in func:"+g_money)
+        }
+      )
+      console.log("g_money after fuc : "+g_money)
+      ;
+      /* console.log("caller : " + RunSql('select `money` from `member` where id = "' + String(msg.author.id) + '" order by `money` desc limit 1')
+      )      
+      var havingmoney = RunSql('select `money` from `member` where id = "' + String(msg.author.id) + '" order by `money` desc limit 1')
+        msg.channel.send("당신에게는 " + havingmoney + "원이 있습니다!");
+      
+      
+        msg.channel.send("당신에게는 돈이 없습니다!");
+      */
       
     }
-    if(msg.content == ".s"){
-      console.log(Number(moneymap.get(msg.author)))
-      if(moneymap.get(msg.author) >= 1){
-        msg.channel.send("당신에게는 " + Number(moneymap.get(msg.author)) + "원이 있습니다!");
-      }
-      else{
-        msg.channel.send("당신에게는 돈이 없습니다!");
-      }
-    }
       if(msg.content == ".b 1"){
-        if(moneymap.get(msg.author) >= 1000 * earningmap.get(msg.author)){
-          earning = Number(earningmap.get(msg.author))
-          lastmoney = moneymap.get(msg.author)
-          moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
-          earningmap.set(msg.author, earning + 1)
+        var money
+                
+        money = RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '" order by `money` desc limit 1', 
+        function(err, results, fields) {
+          return results
+        }
+        )
+        
+        var earning
+        global.earning = earning
+        RunSqlWithFunction('Select `earning` from `member` where id = ' + msg.author.id + "order by `earning` desc limit 1", function(err, resultb1, fields){
+          earning = ReturnParam(resultb1)
+        })
+        console.log(earning + ", " + money)
+        if(money >= earning * 1000){
+        RunSqlWithFunction('Update `member` set `earning` = `earning` + 1 where id = ' + msg.author.id + "order by `earning` desc limit 1", 
+        function(err, results, fields) {
+       
+        earning = Number(earningmap.get(msg.author))
+        lastmoney = moneymap.get(msg.author)
+        moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
+        earningmap.set(msg.author, earning + 1)
+      } 
+         
+        )
+          RunSqlWithFunction('Update `member` set `money` = `money` - (1000 * earning) where id = ' + msg.author.id, 
+            function(err, results, fields) {
+              console.log(results);
+            
+            }
+          );
           msg.channel.send("한번에 얻는 돈의 양이 많아졌다!")
         }
-        else if(moneymap.get(msg.author) < 1000 * earningmap.get(msg.author)){
+        else if(moneymap.get(msg.author) - 1000 * earningmap.get(msg.author) < 1000 * earningmap.get(msg.author)){
           msg.channel.send("돈이 부족합니다.")
         }
           
@@ -1033,6 +1333,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("돈", Dmoney.get(msg.author), true)
     .addField("데미지", Dmg.get(msg.author), true)
     .addField("마나", Dmana.get(msg.author), true)
+    .addField("방어력", ArmDef.get(msg.author) + Defense.get(msg.author), true)
     .addField("버서커 : " + Slevel.get(msg.author)+ "레벨", percentage((Sexp.get(msg.author) / workerexp(Slevel.get(msg.author)) * 100).toFixed(2)))
     .addField("힐러 : " + Hlevel.get(msg.author)+ "레벨", percentage((Hexp.get(msg.author) / workerexp(Hlevel.get(msg.author)) * 100).toFixed(2)))
     .addField("메이지 : " + Wlevel.get(msg.author)+ "레벨",percentage((Wexp.get(msg.author) / workerexp(Wlevel.get(msg.author)) * 100).toFixed(2)))
@@ -1261,9 +1562,11 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     Dhp.set(msg.author, hp*2)
     Djob.set(msg.author, 5)
   }
+  /*
   if(msg.content == ".d sd"){
     msg.channel.send(mappr(maprandom()))
   }
+  */
   if (msg.content === '제작자') {
     msg.reply('https://discord.gg/pcsMCJBj3S에서 제작자를 만나보세요!');
   }
@@ -1274,11 +1577,12 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
   }
     
     if(msg.content.startsWith('-shout')){
-      const str1 = msg.content;
-      msg.reply(str1.substring(6))
+      const strShout = msg.content.substring(6);
+      msg.channel.send(strShout)
 
 
     };
+ 
     if (msg.content === ('뭐먹지')){
       const eatlist = ['떡볶이', "계란말이", '라면', "부대찌개", '생선구이', "소고기", '돼지고기 볶음', "치킨"]; 
       const random1 = Math.floor(Math.random() * 8);
@@ -1439,9 +1743,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                 memomap.delete(msg.author)
                 msg.reply("메모를 지웠습니다!")
               }
-              if(msg.content.startsWith("우")){
-                console.log(msg.author)
-              }
               if(msg.content.startsWith(".a")){
                 msg.channel.bulkDelete(1)
                 const embed2 = new Discord.MessageEmbed()
@@ -1499,17 +1800,12 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 
               
             }
-            if(msg.content.includes === ""){
-              console.log(String(msg.channel.id));
-              console.log(String(msg.author.username));
-            }
             if(msg.content === "파이 = ??"){
               msg.channel.send("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 70679 82148 08651 32823 06647 09384 46095 50582 23172 53594 08128 48111 74502 84102 70193 85211 05559 64462 29489 54930 38196 44288 10975 66593 34461 28475 64823 37867 83165 27120 19091 45648 56692 34603 48610 45432 66482 13393 60726 02491 41273 72458 70066 06315 58817 48815 20920 96282 92540 91715 36436 78925 90360 01133 05305 48820 46652 13841 46951 94151 16094 33057 27036 57595 91953 09218 61173 81932 61179 31051 18548 07446 23799 62749 56735 18857 52724 89122 79381 83011 94912 98336 73362 44065 66430 86021 39494 63952 24737 19070 21798 60943 70277 05392 17176 29317 67523 84674 81846 76694 05132 00056 81271 45263 56082 77857 71342 75778 96091 73637 17872 14684 40901 22495 34301 46549 58537 10507 92279 68925 89235 42019 95611 21290 21960 86403 44181 59813 62977 47713 09960 51870 72113 49999 99837 29780 49951 05973 17328 16096 31859 50244 59455 34690 83026 42522 30825 33446 85035 26193 11881 71010 00313 78387 52886 58753 32083 81420 61717 76691 47303 59825 34904 28755 46873 11595 62863 88235 37875 93751 95778 18577 80532 17122 68066 13001 92787 66111 95909 21642 01989 38095 25720 10654 85863 27886 59361 53381 82796 82303 01952 03530 18529 68995 77362 25994 13891 24972 17752 83479 13151 55748 57242 45415 06959 50829 53311 68617 27855 88907 50983 81754 63746 49393 19255 06040 09277 01671 13900 98488 24012 85836 16035 63707 66010 47101 81942 95559 61989 46767 83744 94482 55379 77472 68471 04047 53464 62080 46684 25906 94912 93313 67702 89891 52104 75216 20569 66024 05803 81501 93511 25338 24300 35587 64024 74964 73263 91419 92726 04269 92279 67823 54781 63600 93417 21641 21992 45863 15030 28618 29745 55706 74983 85054 94588 58692 69956 90927 21079 75093 02955 32116 53449 87202 75596 02364 80665 49911 98818 34797 75356 63698 07426 54252 78625 51818 41757 46728 90977 77279 38000 81647 06001 61452 49192 17321 72147 72350")
             }
             if(msg.content.startsWith("끝말잇기 리셋 ")){
               ggutmalitguimap.set(msg.channel.id, msg.content.substring(8))
               lenggutmalitguimap.set(msg.channel.id, 1)
-              console.log(ggutmalitguimap)
               msg.channel.bulkDelete(1)
               const resetembed = new Discord.MessageEmbed()
               .setAuthor("끝말잇기 초기화!")
@@ -1521,17 +1817,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               msg.channel.send("https://tenor.com/view/matrix-agent-bulletproof-speed-gif-7432265")
               msg.channel.send("푸헤헤헤 최첨단 리셋술!")
             }
-           if(msg.content.includes("@everyone")){
-           console.log(msg.author.username) 
-           msg.channel.bulkDelete(1)
-           }
-           if(msg.content.startsWith("%청소 ")){
-            const chungsoinput = msg.content.substring(4)
-            console.log(msg.author.username)
-            msg.channel.bulkDelete(chungsoinput)
-           
-           
-          }
           if(msg.content.startsWith("♪공지 ")){
             const messagegongji = msg.content.substring(4)
             const countlist = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1612,5 +1897,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     
       
     )
+    
 client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
 
