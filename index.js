@@ -1,4 +1,5 @@
-global.g_money = 1
+let prefix;
+let multiple;
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.on('ready', () => {
@@ -265,8 +266,6 @@ function RunSqlWithFunction(testQuery, fnct) {
   
   };
 function RunSqlWithParam(testQuery, fnct, value){
-  var valueInSql = value
-  console.log(valueInSql)
   connection.query(testQuery, fnct)
 }
 function inventorynum(num){
@@ -1193,36 +1192,37 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       if(msg.author.id != "682358033937989632"){
       const randomint = Math.floor(Math.random()*1000)
       if(randomint <= 1000){
-        var prefix = "동전"
-        var multiple = 1
+         prefix = "동전"
+         multiple = 1
           if(randomint <= 200 + (20 * percentmap.get(msg.author))){
-            var prefix = "금"
-            var multiple = 10
+             prefix = "금"
+             multiple = 10
             if(randomint <= 50 + (10 * percentmap.get(msg.author))){
-              var prefix = "다이아몬드"
-              var multiple = 500
+               prefix = "다이아몬드"
+               multiple = 500
               if(randomint <= 10 + (10 * percentmap.get(msg.author))){
-                var prefix = "에메랄드"
-                var multiple = 5000
+                 prefix = "에메랄드"
+                 multiple = 5000
                   if(randomint <= 5 + (5 * percentmap.get(msg.author))){
-                    var prefix = "운석"
-                    var multiple = 10000
+                     prefix = "운석"
+                    multiple = 10000
       }}}}}  
     }
     else{
      var prefix = "우주의 기운"
-     var multiple = 1000000 
+     multiple = 1000000 
     }
-      
-      RunSqlWithFunction('Select `earning` where id = ' + msg.author.id, function(err, resultEarning, fields){
-        msg.channel.send(prefix + "을(를) 발견했습니다! " + resultEarning * Number(multiple) + "원을 벌었습니다!")
-        RunSqlWithParam('Update `member` set `money` = `money` + ' +  valueInSql * 1000, 
-        function(err, results, fields){
-          
-        }, resultEarning)
-      })
-      
-  }
+        RunSqlWithFunction('Select `earning` from `member` where id = ' + msg.author.id,
+          function(err, results, field){
+          msg.channel.send(prefix + "을(를) 발견했습니다! " + results[0].earning * Number(multiple) + "원을 벌었습니다!")
+          }
+        )        
+        RunSqlWithFunction('Update `member` set `money` = `money` + `earning` * '+ multiple+' where id = ' + msg.author.id, 
+        function(err, results, field){
+        })
+      }
+     
+  
   
       
   
@@ -1269,7 +1269,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         lastmoney = moneymap.get(msg.author)
         moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
         earningmap.set(msg.author, earning + 1)
-          RunSqlWithFunction('Update `member` set `money` = `money` - (1000 * earning) where id = ' + msg.author.id, 
+          RunSqlWithFunction('Update `member` set `money` = `money` - (1000 * `earning`) where id = ' + msg.author.id, 
             function(err, results, fields) {
               console.log(results);
             
