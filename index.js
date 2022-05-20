@@ -264,6 +264,11 @@ function RunSqlWithFunction(testQuery, fnct) {
   connection.query(testQuery, fnct)
   
   };
+function RunSqlWithParam(testQuery, fnct, value){
+  var valueInSql = value
+  console.log(valueInSql)
+  connection.query(testQuery, fnct)
+}
 function inventorynum(num){
 //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
 if(num==1){
@@ -565,14 +570,14 @@ function mappr(map,pos){
       }
       else{
         if(jj){
-          mpr+="  p  |"
+          mpr+="  :grinning:  |"
         }
         else{
           if(10>pp){
             mpr+="  "+pp+"  |"
           }
           else{
-            mpr+=" "+pp+"  |"
+            mpr+=" "+pp+" c |"
           }
         }
       }
@@ -1081,7 +1086,7 @@ function levelexp(lev){
     console.log(msgSub)
     mm=move_show(msgSub,map,pos)
       if(mm!=0){
-        msg.channel.send(mm)
+        msg.channel.send(mm + "\n선택하세요 w/a/s/d")
       }
   }
   else if(msg.content == "w" || msg.content == "s" || msg.content == "a" || msg.content == "d"){
@@ -1089,8 +1094,7 @@ function levelexp(lev){
     var mcontent = msg.content 
       mm=move_show(mcontent,map,pos)
       if(mm!=0){
-        msg.channel.send(mm)
-        msg.channel.send()
+        msg.channel.send(mm+'\n'+mappr(map,pos))
       }
   }
   if (msg.content === '우돌') {
@@ -1209,15 +1213,22 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
      var prefix = "우주의 기운"
      var multiple = 1000000 
     }
-      msg.channel.send(prefix + "을(를) 발견했습니다! " + earningmap.get(msg.author) * Number(multiple) + "원을 벌었습니다!")
-      lastmoney = Number(moneymap.get(msg.author));
-      moneymap.set(msg.author, lastmoney += 1 * Number(multiple));
-      RunSqlWithFunction('Update `member` set `money` = `money` + ' + earningmap.get(msg.author) * Number(multiple) +  ' where id = ' + msg.author.id,
-      function(err, results, fields) {
-        
-      }
-      )
-    }
+      
+      RunSqlWithFunction('Select `earning` where id = ' + msg.author.id, function(err, resultEarning, fields){
+        msg.channel.send(prefix + "을(를) 발견했습니다! " + resultEarning * Number(multiple) + "원을 벌었습니다!")
+        RunSqlWithParam('Update `member` set `money` = `money` + ' +  valueInSql * 1000, 
+        function(err, results, fields){
+          
+        }, resultEarning)
+      })
+      
+  }
+  
+      
+  
+       
+   
+    
 
     if(msg.content == ".s"){
       g_money = 2
@@ -1244,29 +1255,20 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       if(msg.content == ".b 1"){
         var money
                 
-        money = RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '" order by `money` desc limit 1', 
+        RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '"and `money` >= `earning` * 1000 order by `money` desc limit 1', 
         function(err, results, fields) {
-          return results
-        }
+          console.log(results[0].money)
+
+          if(Number(results[0].money) > 0){
+            console.log(Number(results[0].money) > 0)
+            RunSqlWithFunction('Update `member` set `earning` = `earning` + 1 where id = ' + msg.author.id, 
+        function(err, results, fields) {} 
+         
         )
-        
-        var earning
-        global.earning = earning
-        RunSqlWithFunction('Select `earning` from `member` where id = ' + msg.author.id + "order by `earning` desc limit 1", function(err, resultb1, fields){
-          earning = ReturnParam(resultb1)
-        })
-        console.log(earning + ", " + money)
-        if(money >= earning * 1000){
-        RunSqlWithFunction('Update `member` set `earning` = `earning` + 1 where id = ' + msg.author.id + "order by `earning` desc limit 1", 
-        function(err, results, fields) {
-       
         earning = Number(earningmap.get(msg.author))
         lastmoney = moneymap.get(msg.author)
         moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
         earningmap.set(msg.author, earning + 1)
-      } 
-         
-        )
           RunSqlWithFunction('Update `member` set `money` = `money` - (1000 * earning) where id = ' + msg.author.id, 
             function(err, results, fields) {
               console.log(results);
@@ -1275,24 +1277,40 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           );
           msg.channel.send("한번에 얻는 돈의 양이 많아졌다!")
         }
-        else if(moneymap.get(msg.author) - 1000 * earningmap.get(msg.author) < 1000 * earningmap.get(msg.author)){
-          msg.channel.send("돈이 부족합니다.")
-        }
-          
+      else{
+        msg.channel.send("돈이 부족합니다.")
+      }
+      })
+        
         }
         
         if(msg.content == ".b 2"){
-          if(moneymap.get(msg.author) >= 1000 * percentmap.get(msg.author)){
-            percent = Number(percentmap.get(msg.author))
-            lastmoney = moneymap.get(msg.author)
-            moneymap.set(msg.author, lastmoney - 1000 * percentmap.get(msg.author))
-            percentmap.set(msg.author, percent + 1)
-            msg.channel.send("좋은 아이템을 발견할 확률이 늘어났다!")
-          }
-          else if(moneymap.get(msg.author) < 1000 * percentmap.get(msg.author)){
-            msg.channel.send("돈이 부족합니다.")
-          }
+          RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '"and `money` >= `percent` * 1000 order by `money` desc limit 1', 
+        function(err, results, fields) {
+          console.log(results[0].money)
+
+          if(Number(results[0].money) > 0){
+            console.log(Number(results[0].money) > 0)
+            RunSqlWithFunction('Update `member` set `percent` = `percent` + 1 where id = ' + msg.author.id, 
+        function(err, results, fields) {} 
+         
+        )
+        earning = Number(earningmap.get(msg.author))
+        lastmoney = moneymap.get(msg.author)
+        moneymap.set(msg.author, lastmoney - 1000 * earningmap.get(msg.author))
+        earningmap.set(msg.author, earning + 1)
+          RunSqlWithFunction('Update `member` set `money` = `money` - (1000 * percent) where id = ' + msg.author.id, 
+            function(err, results, fields) {
+              console.log(results);
+            
+            }
+          );
+          msg.channel.send("좋은 아이템을 얻을 확률이 늘어났다!")
+        }
+      else{
+        msg.channel.send("돈이 부족합니다.")
       }
+    })}
       if(msg.content == ".%"){
         percentembed = new MessageEmbed()
           .setTitle(msg.author.username + "의 확률표")
@@ -1898,5 +1916,5 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       
     )
     
-client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
+client.login('ODI3NzczNDE3MDE2NTI0ODUw.GNeMWW.Z7lcaVBDm8OcSCsMloChpde7Ri8U-l5tinj4zY');
 
