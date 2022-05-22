@@ -923,7 +923,7 @@ function levelexp(lev){
     Aexp.set(msg.author, 0);
     Tlevel.set(msg.author, 1);
     Texp.set(msg.author, 0);
-    Dinven.set(msg.author, [1, 35, 26, 32, 28, 20, 0, 0, 0, 0]);
+    Dinven.set(msg.author, [1, 4, 6, 9, 28, 13, 0, 0, 0, 0]);
     DinvenCount.set(msg.author, [1, 1, 1, 1, 13, 1, 0, 0, 0, 0])
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
@@ -934,8 +934,15 @@ function levelexp(lev){
     dungeonCreated.set(msg.author, 1);
     materialReady.set(msg.author, false)
     console.log(msg.author.id)
-    
-    testQuery = "INSERT INTO `member` (`id`, `money`, `earning`, `percent`) VALUES (" + String(msg.author.id) + ", 0, 1, 1);";
+    var inven = "'"
+    var invenC = "'"
+    for(i = 0;i < Dinven.get(msg.author).length;i++){
+      inven += Dinven.get(msg.author)[i]+"/"
+      invenC += DinvenCount.get(msg.author)[i]+"/"
+    }
+    inven += "'"
+    invenC += "'"
+    testQuery = "INSERT INTO `member` (`id`, `money`, `earning`, `percent`, `inventory`, `inventCount`) VALUES (" + String(msg.author.id) + ", 0, 1, 1, "+String(inven)+", "+ String(invenC)+");";
     
   connection.query(testQuery, function (err, results, fields) { // testQuery 실행
       if (err) {
@@ -1052,17 +1059,25 @@ function levelexp(lev){
       }
   }
   if(msg.content == ".d inv"){
-    var invenList = ""
-    for(var i = 0;i<=Dinven.get(msg.author).length - 1;i++){
-      if(Dinven.get(msg.author)[i] != 0 && typeof(Dinven.get(msg.author)[i]) != "undefined"){
-        invenList += "\n" + String(Number(i+1)+". " + inventorynum(Dinven.get(msg.author)[i])[0] + ", " + DinvenCount.get(msg.author)[i]+ "개")
+    RunSqlWithFunction('Select `inventory`, `inventCount` from `member` where id = '+msg.author.id+" order by `inventory` desc, `inventCount` desc",
+    function(err, result, field){
+    var invenList = "인벤토리 : "
+    var invent = result[0].inventory
+    var invenTC = result[0].inventCount
+    var inventory = invent.split("/")
+    var inventoryCount = invenTC.split("/")
+    console.log(inventory)
+    for(var i = 0;i<= inventory.length - 1;i++){
+      if(Number(inventory[i]) != 0 && typeof(inventory) != "undefined"){
+        console.log("Riccota Cheese Salad")
+        invenList += "\n" + String(Number(i+1)+". " + inventorynum(inventory[i])[0] + ", " + inventoryCount[i]+ "개")
         
     }
     else{
       invenList += "\n"+ String(Number(i+1)+". "+"비어 있음")
-  }}
+    }}
     msg.channel.send(invenList)
-  }
+})}
   if(msg.content.startsWith(".d sl ")){
     var content = Number(msg.content.substring(6)) - 1;
     if(Dinven.get(msg.author)[content] != 0 && typeof(Dinven.get(msg.author)[content]) != "undefined"){
@@ -1189,34 +1204,31 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 
 }
     if(msg.content == ".g"){
+      RunSqlWithFunction('Select `percent`,`earning` from `member` where id = '+msg.author.id + " order by `percent` desc limit 1",
+      function(err,result, field){
       if(msg.author.id != "682358033937989632"){
       const randomint = Math.floor(Math.random()*1000)
       if(randomint <= 1000){
-         prefix = "동전"
-         multiple = 1
-          if(randomint <= 200 + (20 * percentmap.get(msg.author))){
-             prefix = "금"
-             multiple = 10
-            if(randomint <= 50 + (10 * percentmap.get(msg.author))){
-               prefix = "다이아몬드"
-               multiple = 500
-              if(randomint <= 10 + (10 * percentmap.get(msg.author))){
-                 prefix = "에메랄드"
-                 multiple = 5000
-                  if(randomint <= 5 + (5 * percentmap.get(msg.author))){
-                     prefix = "운석"
-                    multiple = 10000
-      }}}}}  
-    }
+        prefix = "동전"
+        multiple = 1}
+        else if(randomint <= 200 + (20 * result[0].percent)){
+          prefix = "금"
+          multiple = 10}
+          else if(randomint <= 50 + (10 * result[0].percent)){
+            prefix = "다이아몬드"
+            multiple = 500}
+            else if(randomint <= 10 + (10 * result[0].percent)){
+              prefix = "에메랄드"
+              multiple = 5000}
+            if(randomint <= 5 + (5 * result[0].percent)){
+              prefix = "운석"
+            multiple = 10000}}
     else{
      var prefix = "우주의 기운"
      multiple = 1000000 
-    }
-        RunSqlWithFunction('Select `earning` from `member` where id = ' + msg.author.id,
-          function(err, results, field){
-          msg.channel.send(prefix + "을(를) 발견했습니다! " + results[0].earning * Number(multiple) + "원을 벌었습니다!")
-          }
-        )        
+  }
+  msg.channel.send(prefix + "을(를) 발견했습니다! " + result[0].earning * Number(multiple) + "원을 벌었습니다!")
+})        
         RunSqlWithFunction('Update `member` set `money` = `money` + `earning` * '+ multiple+' where id = ' + msg.author.id, 
         function(err, results, field){
         })
@@ -1312,15 +1324,17 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       }
     })}
       if(msg.content == ".%"){
-        percentembed = new MessageEmbed()
+        RunSqlWithFunction('Select `percent` from `member` where id = '+msg.author.id,function(err, result, field){
+        console.log(result)
+          percentembed = new MessageEmbed()
           .setTitle(msg.author.username + "의 확률표")
-          .addField("동전 확률", String(100 - ((20 + 5 + 1 + 0.5) + 4.5 * percentmap.get(msg.author))) + "%")
-          .addField("금 확률", String(20 + (2 * percentmap.get(msg.author))) + "%")
-          .addField("다이아몬드 확률", String(5 + (1 * percentmap.get(msg.author))) + "%")
-          .addField("에메랄드 확률", String(1 + (1 * percentmap.get(msg.author))) + "%")
-          .addField("운석 확률", String(0.5 + (0.5 * percentmap.get(msg.author))) + "%")
+          .addField("동전 확률", String(100 - ((20 + 5 + 1 + 0.5) + 4.5 * result[0].percent)) + "%")
+          .addField("금 확률", String(20 + (2 * result[0].percent)) + "%")
+          .addField("다이아몬드 확률", String(5 + (1 * result[0].percent)) + "%")
+          .addField("에메랄드 확률", String(1 + (1 * result[0].percent)) + "%")
+          .addField("운석 확률", String(0.5 + (0.5 * result[0].percent)) + "%")
         msg.channel.send(percentembed);
-        }
+        })}
 
 
   if(msg.content == ".d s"){
