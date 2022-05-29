@@ -546,6 +546,7 @@ function skill(job,num){
       if(num==5)  return [4,"힐샷"]
   }
 }
+
 function maprandom(stage, Author){
   //현재는 5스테이지 까지
   map=[[4,2]]
@@ -553,7 +554,7 @@ function maprandom(stage, Author){
   mon=[]
   monhp=[]
   pos=[4,2]
-    
+  Dhp.set(Author, maxhp)
     mm=mapmonstar(stage)
     mon[0]=mm
     monhp[0]=numtohp(mm)
@@ -653,6 +654,7 @@ function mappr(map,pos, Author){
   mpr=""
   ml=map.length
   roomMon = 0
+  monhp = DungeonMonHp.get(Author)
   for(i=0;i<5;i++){
     if(i!=0){
       mpr+="\n"
@@ -672,19 +674,20 @@ function mappr(map,pos, Author){
       if(pos[0]==i && pos[1]==j) jj=1
       
       if(!d){
-        mpr+="      |"
+        mpr+="   벽   |"
       }
       else{
         if(jj){
           mpr+="  :grinning:  |"
         }
         else{
-          if(10>pp){
-            mpr+="  "+pp+"  |"
-          }
-          else{
+          //if(10>pp){
+            mpr+="   "+pp+"   |"
+          //}
+          /*else{
+            
             mpr+=" "+pp+"   |"
-          }
+          }*/
         }
       }
     }
@@ -698,8 +701,8 @@ function move_show(msg,map,pos, Author){
   opi=1
   zz=0
   msgsplit=msg.split(" ")
-  
-    oo=msgsplit[1]-1
+  mon = DungeonMonster.get(Author)
+  oo=msgsplit[1]-1
   if (msg=="hp") return hp
   if(msgsplit.length==2 && msgsplit[0]=="atk" && msgsplit[1]<6 && msgsplit[1]>0){
     if(!fi || oo==dz){
@@ -716,17 +719,17 @@ function move_show(msg,map,pos, Author){
     nth=numtohp(monster[mmm])
     o=numtoname(monster[mmm])
     dz=oo
+    roomMon = DungeonMonHp.get(Author)
     if(monhp[mmm][oo]>0){
       monhp[mmm][oo]-=damage
       pr=[]
       zz=1
-      
-      hp-=monster_information(1,mon[mmm][oo])[2]
-      
       prr=[]
       if(monhp[mmm][oo]<=0){
         fi=false
-        prr[0]=o[oo]+"를 죽였습니다!\n  >데미지:"+damage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))+"\n  >exp:"+monster_information(1,mon[mmm][oo])[5]
+        monhp[mmm][oo] = 0
+        prr[0]=o[oo]+"를 죽였습니다!\n  >데미지:"+damage+"\n  >체력:"+percentage((0).toFixed(2))+"\n  >exp:"+monster_information(1,mon[mmm][oo])[5]
+        console.log(monhp)
         if(Djob.get(Author) == 1){
           curSexp = Sexp.get(Author)
           Sexp.set(Author,curSexp + Number(monster_information(1,mon[mmm][oo])[5]))
@@ -778,16 +781,20 @@ function move_show(msg,map,pos, Author){
             Texp.set(Author, curTexp - workerexp(Tlevel.get(Author) - 1))
           }
         }
+        
         }
       else{  prr[0]=o[oo]+"을 때렸습니다!\n  >데미지:"+damage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))
 
     }
-      
-      if(hp<=0){  prr[1]= o[oo]+"(이)가 당신을 죽였습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage((0).toFixed(2))
-        
+    hp-=monster_information(1,mon[mmm][oo])[2]
+      if(hp<=0){  
+        hp = 0
+        prr[1]= o[oo]+"(이)가 당신을 죽였습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage(((hp/maxhp)*100).toFixed(2))
+        Dhp.set(Author, hp)
     }
-            else { prr[1]= o[oo]+"(이)가 당신을 때렸습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage((0).toFixed(2))
-            }
+            else { prr[1]= o[oo]+"(이)가 당신을 때렸습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage(((hp/maxhp)*100).toFixed(2))
+            Dhp.set(Author, hp)  
+          }
             //}
     //else{
     //  return "이미 죽어있는 몬스터 입니다"
@@ -1195,7 +1202,7 @@ function levelexp(lev){
     Dlevel.set(msg.author, 1);
     Dmoney.set(msg.author, 10000);
     Dhp.set(msg.author, 1000);
-    Dmg.set(msg.author, 200);
+    Dmg.set(msg.author, 5000);
     Dmana.set(msg.author, 100);
     Dstat.set(msg.author, 3);
     Defense.set(msg.author, 1000);
@@ -1406,6 +1413,29 @@ function levelexp(lev){
       if(mm!=0){
         msg.channel.send(mm+'\n'+mappr(Dungeonmap.get(msg.author),pos, msg.author))
       }
+  }
+  if(msg.content == ".d h"){
+    const help = new Discord.MessageEmbed()
+    .setTitle("던전 도움말")
+    .addField(".d mi", "던전 맵을 봅니다.", true)
+    .addField(".d mp", "플레이어가 있는 방의 상태를 봅니다.", true)
+    .addField(".d ms", "현재 좌표를 봅니다.", true)
+    .addField("hp", "플레이어의 체력을 봅니다.", true)
+    .addField(".d inv", "인벤토리를 봅니다.", true)
+    .addField(".d am", "갑옷 창을 봅니다.(미완)", true)
+    .addField(".d eq", "무기를 착용합니다.", true)
+    .addField(".d s", "플레이어의 정보를 봅니다.", true)
+    .addField("atk 몬스터 번호", "몬스터를 때립니다.", true)
+    .addField(".d c", "직업을 바꾸는 메뉴를 엽니다.", true)
+    .addField(".d mt", "상점 메뉴를 엽니다.", true)
+    .addField(".d c", "재료를 이용해 아이템을 만듭니다.")
+    .addField(".d b", "돈을 이용해 아이템을 삽니다.", true)
+    .addField(".d ii 인벤토리 번호", "아이템의 정보를 봅니다.", true)
+    .setColor(0x98F791)
+    .setTimestamp()
+    .setFooter("made by. 우돌 엔터", "https://cdn.discordapp.com/attachments/967405173033037834/980276007812612106/--001.jpg")
+    .setAuthor("우돌봇", "https://cdn.discordapp.com/attachments/827851635405094916/980274050037325834/download20220506192139.png", "https://discord.com/api/oauth2/authorize?client_id=827773417016524850&permissions=8&scope=bot")
+    msg.channel.send(help)
   }
   if(msg.content.startsWith("atk ")){
     mm = move_show(msg.content, map, pos, msg.author)
