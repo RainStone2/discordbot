@@ -4,6 +4,7 @@ let hp = 5000;
 let ff=[0,0]
 let t=0
 let fi=0
+mana=101029381273
 damage=10000
 let maxhp=5000
 const { Client, Intents } = require('discord.js');
@@ -43,7 +44,7 @@ const { fileURLToPath } = require('url');
 //const client = new Discord.Client();
 const https = require('https');
 const querystring = require('querystring');
-const { time } = require('console');
+const { time, Console } = require('console');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 const { MessageEmbed } = require('discord.js');
 function getDictionary(input, callback) {
@@ -156,6 +157,7 @@ const materialReady = new Map();
 const Hlevel = new Map();
 const Hexp = new Map();
 const Dmap = new Map()
+const Dk = new Map();
 const Wlevel = new Map();
 const Wexp = new Map();
 const DungeonMonster = new Map();
@@ -187,65 +189,85 @@ function random(small, big) {
     return Math.floor(Math.random() * (big - small)) + small;
 }
 
-//함수호출:
-//skill(직업,번호)
-//ex:skill(3,2)
+function skill(job, num) {
+  //console.log("GyuKatchu"+job, num)
 
-//함수리턴:
-//1.공격:  1,이름,래밸 재한,배수,횟수,마나,z (z는 일반:1   멀티샷:2   여러번:3)
+  //1.공격:  1,이름,래밸 재한,배수,횟수,마나,z (z는 일반:1   멀티샷:2   여러번:3)
 //2.마법:  2,이름,래밸 재한,마법 대미지,횟수,마나
 //3.방어:  3,이름,래밸 재한,양(빼기),마나
 //4.힐   :  4,이름,래밸 재한,양,마나,횟수
 
 //5.마나:  5,이름,래밸 재한,양
 //6.어글:  6,이름,래밸 재한,턴
+//"슬래시","연속때리기","전사의방패","래전더리히트","전사의정신","마나모으기","힐","파워힐","지속힐","레전더리힐","어그로","방패","돌진","전설의방패","탱커의본능","마나모으기","파이어볼","토네이도","불빛의서리","아이스스톰","파워샷","멀티샷","트리플샷","레전더리샷","힐샷"
+  if (job == 1) {
+    if (num == 1) 
+      return [1, "슬래시", 3, 3, 1, 100, 1];
+    if (num == 2) 
+      return [1, "연속때리기", 7, 0.5, 10, 100, 2];
+    if (num == 3) 
+      return [3, "전사의방패", 10, 500, 300];
+    if (num == 4) 
+      return [1, "래전더리히트", 20, 2, 4, 300, 2];
+    if (num == 5) 
+      return [4, "전사의정신", 25, 3000, 500, 1, 1];
+  } else if (job == 2) {
+    if (num == 1) 
+      return [5, "마나모으기", 1, 1000];
+    if (num == 2) 
+      return [4, "힐", 1, 200, 300, 1, 2];
+    if (num == 3) 
+      return [4, "파워힐", 10, 1000, 1000, 1, 2];
+    if (num == 4) 
+      return [4, "지속힐", 10, 300, 1000, 5, 2];
+    if (num == 5) 
+      return [4, "레전더리힐", 20, 5000, 2000, 1, 2];
+  } else if (job == 3) {
+    if (num == 1) 
+      return [6, "어그로", 1, 5];
+    if (num == 2) 
+      return [3, "방패", 3, 300, 300];
+    if (num == 3) 
+      return [1, "돌진", 7, 3, 1, 0, 1];
+    if (num == 4) 
+      return [3, "전설의방패", 15, 1000, 500];
+    if (num == 5) 
+      return [4, "탱커의본능", 20, 5000, 700, 1];
+  } else if (job == 4) {
+    if (num == 1) 
+      return [5, "마나모으기", 1, 1000];
+    if (num == 2) 
+      return [2, "파이어볼", 1, 500, 1, 500];
+    if (num == 3) 
+      return [2, "토네이도", 5, 300, 3, 800];
+    if (num == 4) 
+      return [2, "불빛의서리", 10, 100, 15, 1500];
+    if (num == 5) 
+      return [2, "아이스스톰", 15, 3000, 1, 2000, 1];
+  } else if (job == 5) {
+    if (num == 1) 
+      return [1, "파워샷", 7, 5, 1, 300, 1];
+    if (num == 2) 
+      return [1, "멀티샷", 15, 1, 4, 500, 2];
+    if (num == 3) 
+      return [1, "트리플샷", 15, 1, 3, 500, 3];
+    if (num == 4) 
+      return [1, "레전더리샷", 20, 3, 3, 700, 2];
+    if (num == 5) 
+      return [4, "힐샷", 25, 3000, 100, 3, 1];
+  }
 
-//1.전사  2.힐러  3.탱커  4.마법사  5.궁수
-
-function skill(job,num){
-  if(job==1){
-      if(num==1)  return [1,"슬래시",3,3,1,100,1]
-      if(num==2)  return [1,"연속떄리기",7,0.5,10,100,2]
-      if(num==3)  return [3,"전사의 방패",10,500,300]
-      if(num==4)  return [1,"래전더리 히트",20,2,4,300,2]
-      if(num==5)  return [4,"전사의 정신",25,3000,500,1]
-  }else if(job==2){
-      if(num==1)  return [5,"마나모으기",1,1000]
-      if(num==2)  return [4,"힐",1,200,300,1]
-      if(num==3)  return [4,"파워힐",10,1000,1000,1]
-      if(num==4)  return [4,"지속힐",10,300,1000,5]
-      if(num==5)  return [4,"레전더리힐",20,5000,2000,1]
-  }else if(job==3){
-      if(num==1)  return [6,"어그로",1,5]
-      if(num==2)  return [3,"방패",3,300,300]
-      if(num==3)  return [1,"돌진",7,3,1,0,1]
-      if(num==4)  return [3,"전설의 방패",15,1000,500]
-      if(num==5)  return [4,"탱커의 본능",20,5000,700]
-  }else if(job==4){
-      if(num==1)  return [5,"마나모으기",1,1000]
-      if(num==2)  return [2,"파이어볼",1,500,1,500]
-      if(num==3)  return [2,"토네이도",5,300,3,800]
-      if(num==4)  return [2,"불빛의 서리",10,100,15,1500]
-      if(num==5)  return [2,"아이스스톰",15,3000,1,2000,1]
-  }else if(job==5){
-      if(num==1)  return [1,"파워샷",7,5,1,300,1]
-      if(num==2)  return [1,"멀티샷",15,1,4,500,2]
-      if(num==3)  return [1,"트리플샷",15,1,3,500,3]
-      if(num==4)  return [1,"레전더리샷",20,3,3,700,2]
-      if(num==5)  return [4,"힐샷",25,3000,100,3]
+}
+/*
+function skillmsg(msg, Author) {
+  var Dskill = skill(Djob.get(Author), msg)
+  if(Dskill != undefined){
+    return Dskill
   }
 }
+*/
 
-function skillmsg(msg){
-  //skill을 보냈는지 확인하는 함수임
-  for(qq1=1;qq1<5;qq1++){
-      for(qq2=1;qq2<5;qq2++){
-          if(msg==skill(qq1,qq2)[2]){
-              return skill(qq1,qq2)
-          }
-      }
-  }
-}
+
 function monster_information(num1,num2){
   
   //이름,체력,데미지,쿨타임,스테이지↓,스테이지↑,exp
@@ -271,7 +293,36 @@ function monster_information(num1,num2){
     if(num2==8) return ["신"             ,100000,10000,5]
   }
 }
-
+function skillmsg(msg) {
+  k = 0;
+  msgsplitt = msg.split(" ");
+  pr2=[]
+  msg = msgsplitt[0];
+  if (msgsplitt.length == 2 && msgsplitt[1] <= 5 && msgsplitt[1] >= 1){     //skill을 보냈는지 확인하는 함수임
+    console.log("IF문에 들어옴")
+    for (qq1 = 1; qq1 < 5; qq1++) {
+    for (qq2 = 1; qq2 < 5; qq2++) {
+      console.log("A : "+qq1 +","+qq2)
+      if (msg == skill(qq1, qq2)[1]) {
+        k = 1;
+        pr2 = [msgsplit[1]];
+        for (qq3 = 0; qq3 < skill(qq1, qq2).length; qq3++) {
+          pr2[qq3 + 1] = skill(qq1, qq2)[qq3  ];
+        }
+        //pr2=[msgsplit[1],skill(qq1,qq2)]
+        return pr2;
+      }
+    }
+  }
+}
+/*
+for (qq3 = 0; qq3 < skill(1, 1).length; qq3++) {
+  pr2[qq3 + 1] = skill(1, 1)[qq3  ];
+}
+k=1
+return pr2;
+*/
+}
 function numtoname(a){
   al=a.length
   b=[]
@@ -511,42 +562,6 @@ function mapmonstar(stage){
 }
 
 
-//1 잔몹:해골,맷돼지,기사,고블린,트롤,마녀,슬라임,사신
-//2 보스:아이스 드래곤,파이어 드래곤,레전더리 드래곤,골램,케르베로스,마왕,악마,신
-function skill(job,num){
-  if(job==1){
-      if(num==1)  return [1,"슬래시",3]
-      if(num==2)  return [1,"연속떄리기",7]
-      if(num==3)  return [3,"전사의 방패",10]
-      if(num==4)  return [1,"래전더리 히트",20]
-      if(num==5)  return [4,"전사의 정신",25]
-  }else if(job==2){
-      if(num==1)  return [5,"마나모으기",1]
-      if(num==2)  return [4,"힐",1]
-      if(num==3)  return [4,"파워힐",10]
-      if(num==4)  return [4,"지속힐",10]
-      if(num==5)  return [4,"레전더리힐",20]
-  }else if(job==3){
-      if(num==1)  return [6,"어그로",1]
-      if(num==2)  return [3,"방패",3]
-      if(num==3)  return [1,"돌진",7]
-      if(num==4)  return [3,"전설의 방패",15]
-      if(num==5)  return [4,"탱커의 본능",20]
-  }else if(job==4){
-      if(num==1)  return [5,"마나모으기",1]
-      if(num==2)  return [2,"파이어볼",1]
-      if(num==3)  return [2,"토네이도",5]
-      if(num==4)  return [2,"불빛의 서리",10]
-      if(num==5)  return [2,"아이스스톰",15]
-  }else if(job==5){
-      if(num==1)  return [1,"파워샷",5]
-      if(num==2)  return [1,"멀티샷",10]
-      if(num==3)  return [1,"트리플샷",20]
-      if(num==4)  return [1,"레전더리샷"]
-      if(num==5)  return [4,"힐샷"]
-  }
-}
-
 function maprandom(stage, Author){
   //현재는 5스테이지 까지
   map=[[4,2]]
@@ -649,7 +664,7 @@ function maprandom(stage, Author){
   DungeonMonster.set(Author, mon)
   return map
 }
-
+ 
 function mappr(map,pos, Author){
   mpr=""
   ml=map.length
@@ -700,11 +715,106 @@ function mappr(map,pos, Author){
 function move_show(msg,map,pos, Author){
   opi=1
   zz=0
-  msgsplit=msg.split(" ")
   mon = DungeonMonster.get(Author)
+  opi = 1;
+  zz = 0;
+  at=1
+  msgsplit = msg.split(" ");
+  oo = msgsplit[1] - 1;
+  sm = skillmsg(msg);
+  
+  if (k == 1) {
+    
+    at=0
+    if(sm[1]==1){
+    if(sm[6]<mana){
+      mana-=sm[6]
+    opi = sm[5] + 1;
+    mmm = sm[0];
+    nth = numtohp(mon[mmm]);
+    o = numtoname(mon[mmm]);
+    dz = oo;
+    if (monhp[mmm][oo] > 0) {
+      cdamage = Dmg.get(Author) * sm[4];
+      monhp[mmm][oo] -= cdamage;
+      pr = [];
+      zz = 1;
+      hp -= monster_information(1, mon[mmm][oo])[2];
+      prr = [];
+      for (ii = 0; ii < opi-1; ii++) {
+        if (monhp[mmm][oo] <= 0) {
+          monhp[mmm][oo] -= cdamage;
+          prr[ii] = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2)) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
+        } else {
+          monhp[mmm][oo] -= cdamage;
+          prr[ii] = o[oo] + "을 때렸습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2));
+        }
+      }
+      if (hp <= 0) prr[ii] = o[oo] + "가 당신을 죽였습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
+      else prr[ii] = o[oo] + "가 당신을 때렸습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
+      return prr;
+    } else {
+      at = 1;
+      return "이미 죽어있는 몬스터 입니다";
+    }
+  }
+  else{
+    at=1
+    return "마나가 부족합니다"
+  }
+  }
+  }
   oo=msgsplit[1]-1
+  opi = 1;
+  zz = 0;
+  at=1
+  msgsplit = msg.split(" ");
+  oo = msgsplit[1] - 1;
+  sm = skillmsg(msg);
+  if (Dk.get(Author) == 1) {
+    
+    at=0
+    if(sm[1]==1){
+    if(sm[6]<mana){
+      mana-=sm[6]
+    opi = sm[5] + 1;
+    mmm = sm[0];
+    nth = numtohp(mon[mmm]);
+    o = numtoname(mon[mmm]);
+    dz = oo;
+    if (monhp[mmm][oo] > 0) {
+      cdamage = Dmg.get(Author) * sm[4];
+      monhp[mmm][oo] -= cdamage;
+      pr = [];
+      zz = 1;
+      hp -= monster_information(1, mon[mmm][oo])[2];
+      prr = [];
+      for (ii = 0; ii < opi-1; ii++) {
+        if (monhp[mmm][oo] <= 0) {
+          monhp[mmm][oo] -= cdamage;
+          prr[ii] = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage(monhp[mmm][oo] / nth[oo] * 100) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
+        } else {
+          monhp[mmm][oo] -= cdamage;
+          prr[ii] = o[oo] + "을 때렸습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage(monhp[mmm][oo] / nth[oo] * 100);
+        }
+      }
+      if (hp <= 0) prr[ii] = o[oo] + "가 당신을 죽였습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage(hp / maxhp * 100);
+      else prr[ii] = o[oo] + "가 당신을 때렸습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage(hp / maxhp * 100);
+      return prr;
+    } else {
+      at = 1;
+      return "이미 죽어있는 몬스터 입니다";
+    }
+  }
+  else{
+    at=1
+    return "마나가 부족합니다"
+  }
+  }
+  }
   if (msg=="hp") return hp
-  if(msgsplit.length==2 && msgsplit[0]=="atk" && msgsplit[1]<6 && msgsplit[1]>0){
+  
+  if(msgsplit.length==2 && msgsplit[0]=="atk" && msgsplit[1]<6 && msgsplit[1]>0 || skill(Djob.get(Author),msgsplit[0]) != undefined){
     if(!fi || oo==dz){
     for(m=0;m<ml;m++){
         if(map[m][0]==pos[0] && map[m][1]==pos[1]){
@@ -713,22 +823,36 @@ function move_show(msg,map,pos, Author){
       }
     }
     opi=2
+    var Skilldamage
+    cdamage = Dmg.get(Author)
     monster = DungeonMonster.get(Author)
     monhp = DungeonMonHp.get(Author)
-    damage = Dmg.get(Author) + (STdmg.get(Author)*100)
+    if(skill(Djob.get(Author), msgsplit[0]) != undefined){
+      Dskill = skill(Djob.get(Author),msgsplit[0])
+      Skilldamage = Dmg.get(Author) + (STdmg.get(Author)*100) * Dskill[3]
+
+    }
+    else{
+      Skilldamage = 0
+    }
     nth=numtohp(monster[mmm])
     o=numtoname(monster[mmm])
     dz=oo
     roomMon = DungeonMonHp.get(Author)
     if(monhp[mmm][oo]>0){
-      monhp[mmm][oo]-=damage
+      if(Skilldamage != undefined){
+      monhp[mmm][oo]-=Skilldamage
+      }
+      else{
+        monhp[mmm][oo] -= cdamage
+      }
       pr=[]
       zz=1
       prr=[]
       if(monhp[mmm][oo]<=0){
         fi=false
         monhp[mmm][oo] = 0
-        prr[0]=o[oo]+"를 죽였습니다!\n  >데미지:"+damage+"\n  >체력:"+percentage((0).toFixed(2))+"\n  >exp:"+monster_information(1,mon[mmm][oo])[5]
+        prr[0]=o[oo]+"를 죽였습니다!\n  >데미지:"+cdamage+"\n  >체력:"+percentage((0).toFixed(2))+"\n  >exp:"+monster_information(1,mon[mmm][oo])[5]
         console.log(monhp)
         if(Djob.get(Author) == 1){
           curSexp = Sexp.get(Author)
@@ -783,7 +907,7 @@ function move_show(msg,map,pos, Author){
         }
         
         }
-      else{  prr[0]=o[oo]+"을 때렸습니다!\n  >데미지:"+damage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))
+      else{  prr[0]=o[oo]+"을 때렸습니다!\n  >데미지:"+cdamage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))
 
     }
     hp-=monster_information(1,mon[mmm][oo])[2]
@@ -893,7 +1017,6 @@ function move_show(msg,map,pos, Author){
     return(".d mi를 통해 맵을 먼저 생성하셔야 합니다.")
   }
 }
-  
   if(msg=="w"){
     a=0
     ml=map.length
@@ -939,7 +1062,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[0]++
-      return ("아래으로 갔습니다")
+      return ("아래로 갔습니다")
     }
     else{
       return ("아래에 아무것도 없습니다")
@@ -963,7 +1086,7 @@ function move_show(msg,map,pos, Author){
     }
   }
   return 0
-}
+ }
 function mapinformation(){
   j=0
   for(i=0;i<100;i++){
@@ -1199,10 +1322,10 @@ function levelexp(lev){
     Dplayer.set(msg.author, msg.author.username);
     Dexp.set(msg.author, 0);
     Djob.set(msg.author, 1);
-    Dlevel.set(msg.author, 1);
+    Dlevel.set(msg.author, 4);
     Dmoney.set(msg.author, 10000);
     Dhp.set(msg.author, 1000);
-    Dmg.set(msg.author, 5000);
+    Dmg.set(msg.author, 200);
     Dmana.set(msg.author, 100);
     Dstat.set(msg.author, 3);
     Defense.set(msg.author, 1000);
@@ -1223,6 +1346,7 @@ function levelexp(lev){
     SThp.set(msg.author, 0);
     STdmg.set(msg.author, 0);
     STmana.set(msg.author, 0);
+    Dmana.set(msg.author, 10)
     WaitingForAtack.set(msg.author, false);
     Dequiped.set(msg.author, "미정");
     EquippedSword.set(msg.author, 0);
@@ -1238,7 +1362,7 @@ function levelexp(lev){
     }
     inven += "'"
     invenC += "'"
-    testQuery = "INSERT INTO `member` (`id`, `money`, `earning`, `percent`, `inventory`, `inventCount`) VALUES (" + String(msg.author.id) + ", 0, 1, 1, "+String(inven)+", "+ String(invenC)+");";
+    testQuery = "INSERT INTO `member` (`id`, `money`, `earning`, `percent`, `inventory`, `inventCount`, `name`) VALUES (" + String(msg.author.id) + ", 0, 1, 1, "+String(inven)+", "+ String(invenC)+", '"+String(Dplayer.get(msg.author))+"');";
     
   connection.query(testQuery, function (err, results, fields) { // testQuery 실행
       if (err) {
@@ -1285,17 +1409,23 @@ function levelexp(lev){
     else{
       var ArmorStatus = "착용 안함"
     }
-    
+    if(inventorynum(Dequiped.get(msg.author)) == undefined){
+      weapon = "착용 안함"
+    }
+    else{
+      weapon = String(inventorynum(Dequiped.get(msg.author))[0])
+    }
     const ArmorEmbed = new Discord.MessageEmbed()
     .setTitle("갑옷 착용 명령어")
     .addField("착용 중인 갑옷 ",ArmorStatus, true)
-    .addField("착용 중인 무기 : ",String(inventorynum(Dequiped.get(msg.author))[0]))
+    .addField("착용 중인 무기 : ", weapon)
     .addField(".d am1", "체력의 갑옷을 착용합니다.", true)
     .addField(".d am2", "마법사 갑옷을 착용합니다.", true)
     .addField(".d am3", "귀한 갑옷을 착용합니다.", true)
     .addField(".d am4", "철제 갑옷을 착용합니다.", true)
     .addField(".d am5", "다이아 갑옷을 착용합니다.", true)
     .addField(".d am6", "전설의 갑옷을 착용합니다.", true)
+    .setFooter("모든 명령어는 인벤토리에 아이템이 있다는 것을 전제로 합니다.")
     msg.channel.send(ArmorEmbed)
   }
   if(msg.content == ".d am1"){
@@ -1371,7 +1501,6 @@ function levelexp(lev){
     console.log(inventory)
     for(var i = 0;i<= inventory.length - 1;i++){
       if(Number(inventory[i]) != 0 && typeof(inventory) != "undefined"){
-        console.log("Riccota Cheese Salad")
         invenList += "\n" + String(Number(i+1)+". " + inventorynum(inventory[i])[0] + ", " + inventoryCount[i]+ "개")
         
     }
@@ -1390,14 +1519,25 @@ function levelexp(lev){
       msg.channel.send(inventorynum(Dinven.get(msg.author)[content])[0] + "를 팔았습니다! \n" + inventorynum(content)[2] + "원을 벌었습니다!")
       inventory[content] = 0
     }}
-
-  if(msg.content == ".d mi" || msg.content == ".d mp" || msg.content == ".d ms"){
+    mm = move_show(msg.content,map,pos, msg.author);
+  if (mm != 0) {
+    if(at==0){
+    for (i = 0; i < opi; i++) {
+      msg.channel.send(mm[i]);
+    }
+    }
+    else msg.channel.send(mm)
+  }
+    
+    if(msg.content == ".d mi" || msg.content == ".d mp" || msg.content == ".d ms"){
     var stage=5
     var msgSub = msg.content.substring(3)
     console.log(msgSub)
-    if(msg.content == ".d mi" || msg.content == ".d ms" || msg.content == ".d mp"){
+    
+    if(msg.content == ".d mi" || msg.content == ".d ms" || msg.content == ".d mp" ){
     if(Dungeonmap.get(msg.author) != undefined){
     mm=move_show(msgSub,map,pos, msg.author)
+
       if(mm!=0){
         msg.channel.send(mm + "\n선택하세요 w/a/s/d")
       }
@@ -1453,8 +1593,38 @@ function levelexp(lev){
       msg.channel.send(mm[1])
     }
   }}
+  if(msg.content == ".d skill"){
+    var playerJob = Djob.get(msg.author)
+    var jobprefix = ""
+    if(playerJob == 1){
+      jobprefix = "버서커"
+    }
+    else if(playerJob == 2){
+      jobprefix = "힐러"
+    }
+    else if(playerJob == 3){
+      jobprefix = "메이지"
+    }
+    else if(playerJob == 4){
+      jobprefix = "아처"
+    }
+    else if(playerJob == 5){
+      jobprefix = "탱커"
+    }
+    var skills = "["+ jobprefix+ "가 사용 가능한 스킬]"
+    for(var i = 1;i <= 5;i++){
+      skills += "\n-"+skill(playerJob, i)[1]
+      if(Dlevel.get(msg.author) < skill(playerJob, i)[2]){
+        skills += " [레벨 부족]"
+      }
+      else{
+        skills += " [사용 가능]"
+      }
+    }
+    msg.channel.send(skills)
+  }
   if (msg.content === '우돌') {
-    msg.reply('우돌이는 2010년 6월 29일 10시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
+    msg.reply('우돌이는 2010년 6월 29일 22시 30분경에 태어났으며 잘 살아 있는 겜돌이 입니다');
   }
   if (msg.content === '쿨냥') {
     msg.reply('쿨냥이는 2010년 2월 18일에 태어났으며 우돌이랑 같이 게임하는 매우 우돌이 유튜브에 도움을 주는 사람입니다');
@@ -1779,6 +1949,13 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       msg.channel.send("포인트가 부족합니다.")
     }
   }
+  if(msg.content.includes(" ")){
+    Splitmsg = msg.content.split(" ")
+    var Skill = skill(Djob.get(msg.author),Splitmsg[1])
+    if(Skill != undefined){
+      
+    }
+  }
   if(msg.content == ".d c"){
     msg.channel.send(".d cb -> 버서커로 직업 변경\n.d ch -> 힐러로 직업 변경\n.d cw -> 메이지로 직업 변경\n.d ca -> 아처로 직업 변경\n.d ct -> 탱커로 직업 변경")
   }
@@ -1787,40 +1964,40 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .setTitle("무기상점")
     .setColor("#73F2F0")
     .setDescription("상점 도움말입니다.")
-    .addField(".cmt", "전투 상점입니다.")
-    .addField(".imt", "아이템 상점입니다.")
+    .addField(".d cmt", "전투 상점입니다.")
+    .addField(".d imt", "아이템 상점입니다.")
     msg.channel.send(StoreEmbed);
   }
   if(msg.content == ".d cmt"){
     const CombatStoreEmbed1 = new Discord.MessageEmbed()
     .setTitle("전투상점   «0-1»")
     .setDescription("전투 관련 상점입니다.")
-    .addField(inventorynum(1)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(2)[0], "가격 : " + (inventorynum(2))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(3)[0], "가격 : " + (inventorymaterial(3))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(3))[1])[0] + " x "+(inventorymaterial(3))[2],true)
-    .addField(inventorynum(4)[0], "가격 : " + (inventorymaterial(4))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(4))[1])[0] + " x "+(inventorymaterial(4))[2],true)
-    .addField(inventorynum(5)[0], "가격 : " + (inventorymaterial(5))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(5))[1])[0] + " x "+(inventorymaterial(5))[2],true)
-    .addField(inventorynum(6)[0], "가격 : " + (inventorymaterial(6))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(6))[1])[0] + " x "+(inventorymaterial(6))[2], true)
-    .addField(inventorynum(10)[0], "가격 : " + (inventorymaterial(10))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(10))[1])[0] + " x "+(inventorymaterial(10))[2],true)
-    .addField(inventorynum(11)[0], "가격 : " + (inventorymaterial(11))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(11))[1])[0] + " x "+(inventorymaterial(11))[2],true)
-    .addField(inventorynum(13)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(14)[0], "가격 : " + (inventorymaterial(14))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(14))[1])[0] + " x "+(inventorymaterial(14))[2], true)
-    .addField(inventorynum(15)[0], "가격 : " + (inventorymaterial(15))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(15))[1])[0] + " x "+(inventorymaterial(15))[2], true)
-    .addField(inventorynum(16)[0], "가격 : " + (inventorynum(16))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(17)[0], "가격 : " + (inventorynum(17))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(18)[0], "가격 : " + (inventorynum(18))[2] + "\n재료 : 필요 없음", true)
-    .addField(inventorynum(20)[0], "가격 : " + (inventorymaterial(20))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(20))[1])[0] + " x "+(inventorymaterial(20))[2],true)
-    .addField(inventorynum(21)[0], "가격 : " + (inventorymaterial(21))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(21))[1])[0] + " x "+(inventorymaterial(21))[2],true)
-    .addField(inventorynum(22)[0], "가격 : " + (inventorymaterial(22))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(22))[1])[0] + " x "+(inventorymaterial(22))[2],true)
+    .addField("(1) "+inventorynum(1)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
+    .addField("(2) "+inventorynum(2)[0], "가격 : " + (inventorynum(2))[2] + "\n재료 : 필요 없음", true)
+    .addField("(3) "+inventorynum(3)[0], "가격 : " + (inventorymaterial(3))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(3))[1])[0] + " x "+(inventorymaterial(3))[2],true)
+    .addField("(4) "+inventorynum(4)[0], "가격 : " + (inventorymaterial(4))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(4))[1])[0] + " x "+(inventorymaterial(4))[2],true)
+    .addField("(5) "+inventorynum(5)[0], "가격 : " + (inventorymaterial(5))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(5))[1])[0] + " x "+(inventorymaterial(5))[2],true)
+    .addField("(6) "+inventorynum(6)[0], "가격 : " + (inventorymaterial(6))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(6))[1])[0] + " x "+(inventorymaterial(6))[2], true)
+    .addField("(10) "+inventorynum(10)[0], "가격 : " + (inventorymaterial(10))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(10))[1])[0] + " x "+(inventorymaterial(10))[2],true)
+    .addField("(11) "+inventorynum(11)[0], "가격 : " + (inventorymaterial(11))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(11))[1])[0] + " x "+(inventorymaterial(11))[2],true)
+    .addField("(13) "+inventorynum(13)[0], "가격 : " + (inventorynum(1))[2] + "\n재료 : 필요 없음", true)
+    .addField("(14) "+inventorynum(14)[0], "가격 : " + (inventorymaterial(14))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(14))[1])[0] + " x "+(inventorymaterial(14))[2], true)
+    .addField("(15) "+inventorynum(15)[0], "가격 : " + (inventorymaterial(15))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(15))[1])[0] + " x "+(inventorymaterial(15))[2], true)
+    .addField("(16) "+inventorynum(16)[0], "가격 : " + (inventorynum(16))[2] + "\n재료 : 필요 없음", true)
+    .addField("(17) "+inventorynum(17)[0], "가격 : " + (inventorynum(17))[2] + "\n재료 : 필요 없음", true)
+    .addField("(18) "+inventorynum(18)[0], "가격 : " + (inventorynum(18))[2] + "\n재료 : 필요 없음", true)
+    .addField("(20) "+inventorynum(20)[0], "가격 : " + (inventorymaterial(20))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(20))[1])[0] + " x "+(inventorymaterial(20))[2],true)
+    .addField("(21) "+inventorynum(21)[0], "가격 : " + (inventorymaterial(21))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(21))[1])[0] + " x "+(inventorymaterial(21))[2],true)
+    .addField("(22) "+inventorynum(22)[0], "가격 : " + (inventorymaterial(22))[0]+"\n" + "재료 : " + inventorynum((inventorymaterial(22))[1])[0] + " x "+(inventorymaterial(22))[2],true)
     msg.channel.send(CombatStoreEmbed1)
   }
   if(msg.content == ".d imt"){
     const StoreEmbed2 = new Discord.MessageEmbed()
     .setTitle("전투상점   «1-1»")
     .setDescription("포션 상점입니다.")
-    .addField(inventorynum(23)[0],"가격 : "+inventorynum(23)[2],true)
-    .addField(inventorynum(24)[0],"가격 : "+inventorynum(24)[2],true)
-    .addField(inventorynum(25)[0],"가격 : "+inventorynum(25)[2],true)
+    .addField("(23) "+inventorynum(23)[0],"가격 : "+inventorynum(23)[2],true)
+    .addField("(24) "+inventorynum(24)[0],"가격 : "+inventorynum(24)[2],true)
+    .addField("(25) "+inventorynum(25)[0],"가격 : "+inventorynum(25)[2],true)
     msg.channel.send(StoreEmbed2)
   }
   if(msg.content.startsWith(".d c ")){
