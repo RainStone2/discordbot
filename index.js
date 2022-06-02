@@ -833,7 +833,7 @@ function move_show(msg,map,pos, Author){
 
     }
     else{
-      Skilldamage = 0
+      Skilldamage = undefined
     }
     nth=numtohp(monster[mmm])
     o=numtoname(monster[mmm])
@@ -841,7 +841,7 @@ function move_show(msg,map,pos, Author){
     roomMon = DungeonMonHp.get(Author)
     if(monhp[mmm][oo]>0){
       if(Skilldamage != undefined){
-      monhp[mmm][oo]-=Skilldamage
+        monhp[mmm][oo]-=Skilldamage
       }
       else{
         monhp[mmm][oo] -= cdamage
@@ -935,7 +935,7 @@ function move_show(msg,map,pos, Author){
     }
   } 
   if(msg=="ms") return pos
-  if(msg=="mi") return (mappr(map,pos, Author))
+  if(msg=="mi") return (mappr(Dungeonmap.get(Author),pos, Author))
   if(msg=="mp") {
     if(Dungeonmap.get(Author) != undefined){
     monhp = DungeonMonHp.get(Author)
@@ -1028,7 +1028,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[0]--
-      return ("앞으로 갔습니다")
+      return ("앞으로 갔습니다\n"+mappr(map, pos, Author))
     }
     else{
       return ("앞에 아무것도 없습니다")
@@ -1045,7 +1045,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[1]--
-      return ("왼쪽으로 갔습니다")
+      return ("왼쪽으로 갔습니다\n"+mappr(map, pos, Author))
     }
     else{
       return ("왼쪽에 아무것도 없습니다")
@@ -1062,7 +1062,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[0]++
-      return ("아래로 갔습니다")
+      return ("아래로 갔습니다\n"+mappr(map, pos, Author))
     }
     else{
       return ("아래에 아무것도 없습니다")
@@ -1079,7 +1079,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[1]++
-      return ("오른쪽으로 갔습니다")
+      return ("오른쪽으로 갔습니다\n"+mappr(map, pos, Author))
     }
     else{
       return ("오른쪽에 아무것도 없습니다")
@@ -1354,7 +1354,7 @@ function levelexp(lev){
     materialReady.set(msg.author, false)
     Dungeonmap.set(maprandom(5, msg.author))
     console.log(msg.author.id)
-    var inven = "'"
+      var inven = "'"
     var invenC = "'"
     for(i = 0;i < Dinven.get(msg.author).length;i++){
       inven += Dinven.get(msg.author)[i]+"/"
@@ -1545,7 +1545,7 @@ function levelexp(lev){
     else{
       msg.channel.send(".d mi를 통해 맵을 만들고 명령을 실행해 주세요")
     }}
-    
+    /*
   else if(msg.content == "w" || msg.content == "s" || msg.content == "a" || msg.content == "d"){
     var stage=5
     var mcontent = msg.content
@@ -1554,6 +1554,7 @@ function levelexp(lev){
         msg.channel.send(mm+'\n'+mappr(Dungeonmap.get(msg.author),pos, msg.author))
       }
   }
+  */
   if(msg.content == ".d h"){
     const help = new Discord.MessageEmbed()
     .setTitle("던전 도움말")
@@ -1566,7 +1567,7 @@ function levelexp(lev){
     .addField(".d eq", "무기를 착용합니다.", true)
     .addField(".d s", "플레이어의 정보를 봅니다.", true)
     .addField("atk 몬스터 번호", "몬스터를 때립니다.", true)
-    .addField(".d c", "직업을 바꾸는 메뉴를 엽니다.", true)
+    .addField(".d cj", "직업을 바꾸는 메뉴를 엽니다.", true)
     .addField(".d mt", "상점 메뉴를 엽니다.", true)
     .addField(".d c", "재료를 이용해 아이템을 만듭니다.")
     .addField(".d b", "돈을 이용해 아이템을 삽니다.", true)
@@ -1956,7 +1957,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       
     }
   }
-  if(msg.content == ".d c"){
+  if(msg.content == ".d cj"){
     msg.channel.send(".d cb -> 버서커로 직업 변경\n.d ch -> 힐러로 직업 변경\n.d cw -> 메이지로 직업 변경\n.d ca -> 아처로 직업 변경\n.d ct -> 탱커로 직업 변경")
   }
   if(msg.content == ".d mt"){
@@ -2009,17 +2010,21 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       console.log(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory))
       console.log(inventorymaterial(marketmsg[2])[1])
       console.log(inventorymaterial(marketmsg[2]))
+      console.log("inventoryFind : "+inventoryFind(inventorymaterial(marketmsg[2])[1], inventory))
       if(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory) != "false"){
-        var materialIndex = inventory.indexOf(inventorymaterial(marketmsg[2])[1])
+        var materialIndex = inventoryFind(inventorymaterial(marketmsg[2])[1], inventory)
         var pastCount = invenCount[materialIndex]
         if(invenCount[materialIndex] - inventorymaterial(marketmsg[2])[2] >= 0){
-          invenCount[materialIndex] = pastCount - inventorymaterial(marketmsg[2])[2]
-        materialReady.set(msg.author, true) 
+          invenCount[materialIndex] -= inventorymaterial(marketmsg[2])[2]
+          console.log("invenCount : "+invenCount)
+          DinvenCount.set(msg.author, invenCount)
+          console.log("DinvenCOunt : "+DinvenCount.get(msg.author))
+          materialReady.set(msg.author, true)
         }
-      }
         else{
           msg.channel.send("재료가 부족한 것 같네요.")
         }
+      }
       }
       if(materialReady.get(msg.author) == true){
         var Currentmoney = Dmoney.get(msg.author)
@@ -2036,9 +2041,20 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         inventory[DinvenIndex] = Number(marketmsg[2])
         Dinven.set(msg.author, inventory)
         var invenCount = DinvenCount.get(msg.author)
+        
         var itemCount = invenCount[DinvenIndex]
         invenCount[DinvenIndex] = itemCount + 1
         DinvenCount.set(msg.author, invenCount)
+        var invenC = "'"
+        var inven = "'"
+        for(i = 0;i < DinvenCount.get(msg.author).length;i++){
+          invenC += DinvenCount.get(msg.author)[i]+"/"
+          inven += Dinven.get(msg.author)[i]+"/"
+        }
+        invenC += "'"
+        inven += "'" 
+        console.log("invenC : "+invenC)
+        RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
         msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
        }
      else{
