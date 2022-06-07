@@ -1570,8 +1570,9 @@ function levelexp(lev){
     .addField(".d cj", "직업을 바꾸는 메뉴를 엽니다.", true)
     .addField(".d mt", "상점 메뉴를 엽니다.", true)
     .addField(".d c", "재료를 이용해 아이템을 만듭니다.")
-    .addField(".d b", "돈을 이용해 아이템을 삽니다.", true)
+    .addField(".d b [잘 작동 안함]", "돈을 이용해 아이템을 삽니다.", true)
     .addField(".d ii 인벤토리 번호", "아이템의 정보를 봅니다.", true)
+    .addField(".d skill", "사용 가능한 스킬을 봅니다.", true)
     .setColor(0x98F791)
     .setTimestamp()
     .setFooter("made by. 우돌 엔터", "https://cdn.discordapp.com/attachments/967405173033037834/980276007812612106/--001.jpg")
@@ -2014,7 +2015,10 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       if(inventoryFind(inventorymaterial(marketmsg[2])[1], inventory) != "false"){
         var materialIndex = inventoryFind(inventorymaterial(marketmsg[2])[1], inventory)
         var pastCount = invenCount[materialIndex]
-        if(invenCount[materialIndex] - inventorymaterial(marketmsg[2])[2] >= 0){
+        RunSqlWithFunction('Select inventCount from member where id = '+msg.author.id, function(err, result, field){
+        var invenC = result[0].inventCount
+        var invenCount = invenC.split("/")
+        if(Number(invenCount[materialIndex]) - inventorymaterial(marketmsg[2])[2] >= 0){
           invenCount[materialIndex] -= inventorymaterial(marketmsg[2])[2]
           console.log("invenCount : "+invenCount)
           DinvenCount.set(msg.author, invenCount)
@@ -2023,45 +2027,50 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         }
         else{
           msg.channel.send("재료가 부족한 것 같네요.")
-        }
-      }
+        }})
+   }
       }
       if(materialReady.get(msg.author) == true){
+        
+        RunSqlWithFunction('Select `inventory`, `inventCount` from `member` where id = '+msg.author.id+" order by `inventory` desc, `inventCount` desc",
+        function(err, result, field){
         var Currentmoney = Dmoney.get(msg.author)
     if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
-        var Currentmoney = Dmoney.get(msg.author)
         Dmoney.set(msg.author, Currentmoney - inventorymaterial(marketmsg[2])[0])
-        var inventory = Dinven.get(msg.author)
+        
         if(inventoryFind(marketmsg[2], inventory) == "false"){
         DinvenIndex = inventory.indexOf(0)
         }
         else{
           DinvenIndex = inventoryFind(marketmsg[2], inventory)
         }
-        inventory[DinvenIndex] = Number(marketmsg[2])
-        Dinven.set(msg.author, inventory)
-        var invenCount = DinvenCount.get(msg.author)
         
-        var itemCount = invenCount[DinvenIndex]
-        invenCount[DinvenIndex] = itemCount + 1
-        DinvenCount.set(msg.author, invenCount)
-        var invenC = "'"
-        var inven = "'"
-        for(i = 0;i < DinvenCount.get(msg.author).length;i++){
-          invenC += DinvenCount.get(msg.author)[i]+"/"
-          inven += Dinven.get(msg.author)[i]+"/"
-        }
-        invenC += "'"
-        inven += "'" 
-        console.log("invenC : "+invenC)
-        RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
-        msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
-       }
-     else{
-       msg.channel.send("돈이 부족합니다.")
-      }}
-      }
-  }
+    var invent = result[0].inventory
+    var invenTC = result[0].inventCount
+    var Dinventory = invent.split("/")
+    var invenCo = invenTC.split("/")
+    Dinventory[DinvenIndex] = Number(marketmsg[2])
+    Dinven.set(msg.author, inventory)
+    var invenCount = invenCo
+    var itemCount = Number(invenCount[DinvenIndex])
+    invenCount[DinvenIndex] = itemCount + 1
+    DinvenCount.set(msg.author, invenCount)
+    var invenC = "'"
+    var inven = "'"
+    for(i = 0;i < DinvenCount.get(msg.author).length;i++){
+      invenC += invenCo[i]+"/"
+      inven += Dinventory[i]+"/"
+    }
+    invenC += "'"
+    inven += "'" 
+    console.log("invenC : "+invenC)
+    RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
+    msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
+    }
+    else{
+      msg.channel.send("돈이 부족합니다.")
+     }})}}}
+  
   if(msg.content.startsWith(".d b ")){
     var inventory = Dinven.get(msg.author)
     var marketmsg = msg.content.split(" ")
@@ -2070,11 +2079,13 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       materialReady.set(msg.author, true)
     }
     if(materialReady.get(msg.author) == true){
-    
-    var Currentmoney = Dmoney.get(msg.author)
+    RunSqlWithFunction('Select inventory, inventCount from member where id = '+msg.author.id,function(err, result, field){
+      invento = result[0].inventory
+      invenCo = result[0].inventCount
+      var Currentmoney = Dmoney.get(msg.author)
     if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
     Dmoney.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
-    var inventory = Dinven.get(msg.author)
+    var inventory = result[0].inventory
       if(inventoryFind(marketmsg[2], inventory) == "false"){
       DinvenIndex = inventory.indexOf(0)
       }
@@ -2083,15 +2094,24 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
       }
       inventory[DinvenIndex] = Number(marketmsg[2])
       Dinven.set(msg.author, inventory)
-      var invenCount = DinvenCount.get(msg.author)
+      var invenCount = result[0].inventCount
       var itemCount = invenCount[DinvenIndex]
       invenCount[DinvenIndex] = itemCount + 1
-      DinvenCount.set(msg.author, invenCount)
+      //DinvenCount.set(msg.author, invenCount)
+      var invenC
+      for(i = 0;i < DinvenCount.get(msg.author).length;i++){
+        invenC += invenCo[i]+"/"
+        inven += invento[i]+"/"
+      }
+      invenC += "'"
+      inven += "'" 
+      console.log("invenC : "+invenC)
+      RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
       msg.channel.send(inventorynum(marketmsg[2])[0] + "를 샀습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
     }
     else{
       msg.channel.send("돈이 부족합니다.")
-    }
+    }})
   }
  
     }
