@@ -26,6 +26,7 @@ client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
 const { deepStrictEqual } = require('assert');
 const { constants } = require('buffer');
 const Discord = require('discord.js');
+const path = require('path');
 const fs = require('fs');
 const mysql = require('mysql');  // mysql 모듈 로드
 const { getgid, exit } = require('process');
@@ -36,7 +37,6 @@ const conn = {  // mysql 접속 설정
     password: '1234',
     database: 'playerinfo'
 };
- 
 
 var connection = mysql.createConnection(conn); // DB 커넥션 생성
 connection.connect();   // DB 접속
@@ -547,9 +547,9 @@ function mapmonstar(stage){
   rm=[]
   for(i=1;i<10;i++){
   mi=monster_information(1,i)
-   mi0=mi[0]
-   mi4=mi[3]
-   mi5=mi[4]
+  mi0=mi[0]
+  mi4=mi[3]
+  mi5=mi[4]
     if(stage>=mi4 && stage<=mi5){
       rmli[rmli.length]=i
     }
@@ -1311,7 +1311,8 @@ function levelexp(lev){
   }
 }
 
-   client.on('message', msg => {
+  client.on('message', msg => {
+    
   if(accountCreated.get(msg.author) != true){
     moneymap.set(msg.author, 0)
     percentmap.set(msg.author, 1)
@@ -1646,7 +1647,6 @@ function levelexp(lev){
     const list = ["가위", "바위", "보"];
     const random = Math.floor(Math.random() * 3);
     const bot = list[random]
-   
     let winner = "";
     if(human === bot) {
       winner = "비김";
@@ -1678,9 +1678,9 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .setDescription("안녕하세요 우돌봇입니다")
     .setThumbnail("https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
     .addField("취미", "대답하기", true)
+    .addField("생년월일", "2021년 4월 3일", true)
     .addField("제작자", "우돌우돌#2268", true)
     .addField("^우돌봇", "우돌봇 프로필을 봅니다", true)
-    .addField("이 봇에게 메시지를 지울 권한을 주세요.", "제작자에게 계속 에러가 갈 수 있습니다", true)
     .addField("가위 또는 바위 또는 보", "봇과 가위바위보를 합니다", true)
     .addField('-shout "하고 싶은 말"', '모두에게 원하는 메시지를 보냅니다', true)
     .addField("우돌", "우돌이에 대한 정보를 봅니다", true)
@@ -1695,11 +1695,13 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("ㄹㅅㅁㄱ", "랜덤 수학 문제를 냅니다", true)
     .addField("%하픽 {닉네임}", "그 닉네임을 가진 사람의 하이픽셀 정보를 봅니다.", true)
     .addField("%스블 {닉네임}", "그 닉네임을 가진 사람의 스카이블럭 정보를 봅니다.", true)
-    .addField("<>{끝말잇기를 진행할 단어}", "끝말잇기를 진행할 수 있습니다. 만약 먹히지 않는다면 DM으로 말씀해 주세요", true)
+    .addField("<>{끝말잇기를 진행할 단어}", "끝말잇기를 할 수 있습니다.", true)
+    .addField("끝말잇기 리셋 {단어}", "끝말잇기 리셋을 합니다.", true)
     .addField("%청소 {숫자}", "숫자에 들어간 숫자만큼 메시지를 청소합니다.", true)
-    .addField("밸게 ㄱ", "밸런스 게임을 합니다")
+    .addField("밸게 ㄱ", "밸런스 게임을 합니다", true)
     .addField("파이 = ??", "파이값 을 보여 줍니다.",true)
-    .addField("!돈", "돈 관련 게임의 도움말을 보여 줍니다.")
+    .addField("!돈", "돈 관련 게임의 도움말을 보여 줍니다.", true)
+    .addField(".d h", "던전 도움말을 봅니다.", true)
     .setTimestamp(new Date())
     msg.channel.send(embed)
 
@@ -1738,8 +1740,8 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               prefix = "운석"
             multiple = 10000}}
     else{
-     var prefix = "우주의 기운"
-     multiple = 1000000 
+    var prefix = "우주의 기운"
+    multiple = 1000000 
   }
   msg.channel.send(prefix + "을(를) 발견했습니다! " + result[0].earning * Number(multiple) + "원을 벌었습니다!")
 })        
@@ -1747,15 +1749,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         function(err, results, field){
         })
       }
-     
-  
-  
-      
-  
-       
-   
-    
-
     if(msg.content == ".s"){
       g_money = 2
       console.log("under 2:"+g_money)
@@ -1849,7 +1842,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           .addField("운석 확률", String(0.5 + (0.5 * result[0].percent)) + "%")
         msg.channel.send(percentembed);
         })}
-
+//
 
   if(msg.content == ".d s"){
     //1-S 2-H 3-W 4-A 5-T
@@ -2296,7 +2289,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             rmap.set(msg.author, rn1 - rn2)
             
           }
-       
             }
             if(msg.content.startsWith("#")){
               const rplayermessage = msg.content
@@ -2380,8 +2372,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                 );
             
                 
-               
-               
             }
           }
             else{
@@ -2410,6 +2400,26 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               msg.channel.send("https://tenor.com/view/matrix-agent-bulletproof-speed-gif-7432265")
               msg.channel.send("푸헤헤헤 최첨단 리셋술!")
             }
+           /* 
+          if(msg.content == "통화방"){
+            const { voice } = msg.member
+            if(!voice.channelID){
+              msg.channel.send("통화방에 들어가 주세요!")
+            }
+            else{
+            voice.channel.join().then((connection) => {
+              connection.play(path.join(__dirname, 'How Beautiful.m4a'))
+            })
+          }
+        }
+        if(msg.content == "통화끝"){
+          const { voice } = msg.member
+          if(!voice.channelID){
+            msg.channel.send("통화방에 있지 않습니다.")
+          }
+          else{
+          voice.channel.leave()
+        }}*/
           if(msg.content.startsWith("♪공지 ")){
             const messagegongji = msg.content.substring(4)
             const countlist = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2479,16 +2489,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             
           }
           const packageJSON = require("./package.json");
-
-
-      
-
-
       }
-      
-      
-    
-      
     )
-    
-client.login('ODI3NzczNDE3MDE2NTI0ODUw.GNeMWW.Z7lcaVBDm8OcSCsMloChpde7Ri8U-l5tinj4zY');
+client.login('ODI3NzczNDE3MDE2NTI0ODUw.GibEMC.qcaTFFZAKuwP68uGt416iV1mhUdFAWH4ipltiQ');
