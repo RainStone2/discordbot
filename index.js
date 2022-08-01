@@ -4,9 +4,13 @@ let hp = 5000;
 let ff=[0,0]
 let t=0
 let fi=0
-mana=101029381273
-damage=10000
+var mana=101029381273
+var damage=10000
 let maxhp=5000
+var WhatToEat = ['떡볶이', "계란말이", '라면', "부대찌개", '생선구이', "소고기", '돼지고기 볶음', "치킨"]
+var WhatToDrink = ["오렌지 주스", "물", "사이다", "콜라", "포도 주스", "코코아"]
+var WhatToDo = ["책 읽으세요", "게임 하세요", "밥 드세요", "자세요", "노세요"]
+var WhatToGame = ["마인크래프트", "닌텐도", "테트리스"]
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.on('ready', () => {
@@ -114,6 +118,7 @@ function getDictionary(input, callback) {
 
 client.on('ready', () => {
   console.log("봇 온!");
+  
 });
 const questionmap = new Map();
 const rmap = new Map();
@@ -1679,7 +1684,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .setThumbnail("https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
     .addField("취미", "대답하기", true)
     .addField("생년월일", "2021년 4월 3일", true)
-    .addField("제작자", "우돌우돌#2268", true)
+    .addField("제작자", "RainStone2#2268", true)
     .addField("^우돌봇", "우돌봇 프로필을 봅니다", true)
     .addField("가위 또는 바위 또는 보", "봇과 가위바위보를 합니다", true)
     .addField('-shout "하고 싶은 말"', '모두에게 원하는 메시지를 보냅니다', true)
@@ -1689,7 +1694,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("오른쪽 또는 왼쪽", "봇과 참참참을 합니다", true)
     .addField("초대 우돌봇", "우돌봇 초대 링크를 받습니다.", true)
     .addField("시계", "시간을 봅니다", true)
-    .addField("뭐먹지", "음식을 추천합니다", true)
+    .addField("우돌봇 집단지성", "집단지성 메뉴를 봅니다", true)
     .addField("우돌봇 날씨", "날씨를 보여줍니다", true)
     .addField("ㄱㄱㄷ ㄱㄱ", "구구단 문제를 냅니다.", true)
     .addField("ㄹㅅㅁㄱ", "랜덤 수학 문제를 냅니다", true)
@@ -1697,11 +1702,11 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("%스블 {닉네임}", "그 닉네임을 가진 사람의 스카이블럭 정보를 봅니다.", true)
     .addField("<>{끝말잇기를 진행할 단어}", "끝말잇기를 할 수 있습니다.", true)
     .addField("끝말잇기 리셋 {단어}", "끝말잇기 리셋을 합니다.", true)
-    .addField("%청소 {숫자}", "숫자에 들어간 숫자만큼 메시지를 청소합니다.", true)
     .addField("밸게 ㄱ", "밸런스 게임을 합니다", true)
     .addField("파이 = ??", "파이값 을 보여 줍니다.",true)
     .addField("!돈", "돈 관련 게임의 도움말을 보여 줍니다.", true)
     .addField(".d h", "던전 도움말을 봅니다.", true)
+    .setFooter("이스터에그를 찾는 재미도 있겠죠?","https://cdn-icons-png.flaticon.com/512/4321/4321484.png")
     .setTimestamp(new Date())
     msg.channel.send(embed)
 
@@ -1782,7 +1787,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             console.log(Number(results[0].money) > 0)
             RunSqlWithFunction('Update `member` set `earning` = `earning` + 1 where id = ' + msg.author.id, 
         function(err, results, fields) {} 
-         
+        
         )
         earning = Number(earningmap.get(msg.author))
         lastmoney = moneymap.get(msg.author)
@@ -1812,7 +1817,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
             console.log(Number(results[0].money) > 0)
             RunSqlWithFunction('Update `member` set `percent` = `percent` + 1 where id = ' + msg.author.id, 
         function(err, results, fields) {} 
-         
+        
         )
         earning = Number(earningmap.get(msg.author))
         lastmoney = moneymap.get(msg.author)
@@ -2021,7 +2026,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         else{
           msg.channel.send("재료가 부족한 것 같네요.")
         }})
-   }
+  }
       }
       if(materialReady.get(msg.author) == true){
         
@@ -2168,12 +2173,37 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
 
 
     };
- 
-    if (msg.content === ('뭐먹지')){
-      const eatlist = ['떡볶이', "계란말이", '라면', "부대찌개", '생선구이', "소고기", '돼지고기 볶음', "치킨"]; 
-      const random1 = Math.floor(Math.random() * 8);
-      const eatresult = eatlist[random1];
-      msg.reply(eatresult);
+    if(msg.content === ('뭐먹지')){
+      WhatToEat = fs.readFileSync("WhatToEat.txt", "utf8", (err, data) =>{
+        return data
+      })
+      WhatToEat = WhatToEat.split("/")
+      const random1 = Math.round(Math.random() * WhatToDrink.length - 1);
+      msg.reply(WhatToEat[random1]);
+    }
+    else if(msg.content === ('뭐마시지')){
+      WhatToDrink = fs.readFileSync("WhatToDrink.txt", "utf8", (err, data) =>{
+        return data
+      })
+      WhatToDrink = WhatToDrink.split("/")
+      const random1 = Math.round(Math.random() * WhatToDrink.length - 1);
+      msg.reply(WhatToDrink[random1]);
+    }
+    else if(msg.content === ('뭐하지')){
+      WhatToDo = fs.readFile("WhatToDo.txt", "utf8", (err, data) =>{
+        return data
+      })
+      WhatToDo = WhatToDo.split("/")
+      const random1 = Math.round(Math.random() * WhatToDo.length - 1);
+      msg.reply(WhatToDo[random1]);
+    }
+    else if(msg.content === ('무슨겜하지')){
+      WhatToGame = fs.readFile("WhatToGame.txt", "utf8", (err, data) =>{
+        return data
+      })
+      WhatToGame = WhatToGame.split("/")
+      const random1 = Math.round(Math.random() * WhatToGame.length - 1);
+      msg.reply(WhatToGame[random1]);
     }
     if(msg.content === "오른쪽" || msg.content === "왼쪽"){
       const humancham = msg.content;
@@ -2370,19 +2400,12 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                   
                   } 
                 );
-            
-                
             }
           }
             else{
               msg.channel.bulkDelete(1)
               msg.channel.send("글자 수가 2글자 이상이 되게 또는 첫 글자가 전 단어의 제일 뒷 자리의 글자와 같게 해 주세요!")
-              
-            }       
-              }
-
-              
-            }
+            }}}
             if(msg.content === "파이 = ??"){
               msg.channel.send("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 70679 82148 08651 32823 06647 09384 46095 50582 23172 53594 08128 48111 74502 84102 70193 85211 05559 64462 29489 54930 38196 44288 10975 66593 34461 28475 64823 37867 83165 27120 19091 45648 56692 34603 48610 45432 66482 13393 60726 02491 41273 72458 70066 06315 58817 48815 20920 96282 92540 91715 36436 78925 90360 01133 05305 48820 46652 13841 46951 94151 16094 33057 27036 57595 91953 09218 61173 81932 61179 31051 18548 07446 23799 62749 56735 18857 52724 89122 79381 83011 94912 98336 73362 44065 66430 86021 39494 63952 24737 19070 21798 60943 70277 05392 17176 29317 67523 84674 81846 76694 05132 00056 81271 45263 56082 77857 71342 75778 96091 73637 17872 14684 40901 22495 34301 46549 58537 10507 92279 68925 89235 42019 95611 21290 21960 86403 44181 59813 62977 47713 09960 51870 72113 49999 99837 29780 49951 05973 17328 16096 31859 50244 59455 34690 83026 42522 30825 33446 85035 26193 11881 71010 00313 78387 52886 58753 32083 81420 61717 76691 47303 59825 34904 28755 46873 11595 62863 88235 37875 93751 95778 18577 80532 17122 68066 13001 92787 66111 95909 21642 01989 38095 25720 10654 85863 27886 59361 53381 82796 82303 01952 03530 18529 68995 77362 25994 13891 24972 17752 83479 13151 55748 57242 45415 06959 50829 53311 68617 27855 88907 50983 81754 63746 49393 19255 06040 09277 01671 13900 98488 24012 85836 16035 63707 66010 47101 81942 95559 61989 46767 83744 94482 55379 77472 68471 04047 53464 62080 46684 25906 94912 93313 67702 89891 52104 75216 20569 66024 05803 81501 93511 25338 24300 35587 64024 74964 73263 91419 92726 04269 92279 67823 54781 63600 93417 21641 21992 45863 15030 28618 29745 55706 74983 85054 94588 58692 69956 90927 21079 75093 02955 32116 53449 87202 75596 02364 80665 49911 98818 34797 75356 63698 07426 54252 78625 51818 41757 46728 90977 77279 38000 81647 06001 61452 49192 17321 72147 72350")
             }
@@ -2397,10 +2420,10 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               .setDescription("로 초기화 되었습니다!")
               .setColor(0x98F791)
               msg.channel.send(resetembed)
-              msg.channel.send("https://tenor.com/view/matrix-agent-bulletproof-speed-gif-7432265")
-              msg.channel.send("푸헤헤헤 최첨단 리셋술!")
+              msg.channel.send("리셋되었습니다!")
+              
             }
-           /* 
+          /* 
           if(msg.content == "통화방"){
             const { voice } = msg.member
             if(!voice.channelID){
@@ -2466,7 +2489,74 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               answered.set(msg.author.username, "true")
               msg.channel.send("[밸게기] 를 입력하여 기록을 보세요!")
             }
-
+          
+          }
+          if(msg.content == "우돌봇 집단지성"){
+            const jipdanjisung = new Discord.MessageEmbed()
+            .setTitle("집단지성 모음")
+            .addField("뭐먹지", "무엇을 먹을까["+WhatToEat.length+"]", true)
+            .addField("뭐마시지", "무엇을 마시지["+WhatToDrink.length+"]", true)
+            .addField("뭐하지", "무엇을 하지["+WhatToDo.length+"]", true)
+            .addField("무슨겜하지", "무슨 게임을 하지["+WhatToGame.length+"]", true)
+            .setFooter("명령어는 집단지성 [옵션] [값]", "https://image.winudf.com/v2/image1/Y29tLm9uZXNpaW4ubG90dG9jaV9zY3JlZW5fN18xNTkyMjU3OTYyXzA0Nw/screen-6.jpg?fakeurl=1&type=.webp")
+            .setColor(0x98F791)
+            msg.channel.send(jipdanjisung)
+          }
+          if(msg.content.startsWith("집단지성")){
+            var JipOption = msg.content.split(" ")[1]
+            var JipValue = msg.content.split(" ")[2]
+            if(JipOption == "뭐먹지"){
+              WhatToEat = fs.readFileSync("WhatToEat.txt", "utf8", (err, data) =>{
+                return data
+              })
+              WhatToEat = WhatToEat.split("/")
+              if(WhatToEat.includes(JipValue) == false){
+                fs.appendFileSync("WhatToEat.txt", "/"+JipValue)
+                msg.channel.send("성공적으로 항목을 추가했습니다!")
+              }
+              else{
+                msg.channel.send("중복되는 항목입니다!")
+              }
+            }
+            else if(JipOption == "뭐마시지"){
+              WhatToDrink = fs.readFileSync("WhatToDrink.txt", "utf8", (err, data) =>{
+                return data
+              })
+              WhatToDrink = WhatToDrink.split("/")
+              if(WhatToDrink.includes(JipValue) == false){
+                fs.appendFileSync("WhatToEat.txt", "/"+JipValue)
+                msg.channel.send("성공적으로 항목을 추가했습니다!")
+              }
+              else{
+                msg.channel.send("중복되는 항목입니다!")
+              }
+            }
+            else if(JipOption == "뭐하지"){
+              WhatToDo = fs.readFileSync("WhatToDo.txt", "utf8", (err, data) =>{
+                return data
+              })
+              WhatToDo = WhatToDo.split("/")
+              if(WhatToDo.includes(JipValue) == false){
+                fs.appendFileSync("WhatToEat.txt", "/"+JipValue)
+                msg.channel.send("성공적으로 항목을 추가했습니다!")
+              }
+              else{
+                msg.channel.send("중복되는 항목입니다!")
+              }
+            }
+            else if(JipOption == "무슨겜하지"){
+              WhatToGame = fs.readFileSync("WhatToGame.txt", "utf8", (err, data) =>{
+                return data
+              })
+              WhatToGame =WhatToGame.split("/")
+              if(WhatToGame.includes(JipValue) == false){
+                fs.appendFileSync("WhatToEat.txt", "/"+JipValue, err)
+                msg.channel.send("성공적으로 항목을 추가했습니다!")
+              }
+              else{
+                msg.channel.send("중복되는 항목입니다!")
+              }
+            }
           }
           if(msg.content === "밸게기"){
             if(answered.get(msg.author.username) === "false"){
