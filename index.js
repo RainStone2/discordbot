@@ -11,8 +11,11 @@ var WhatToEat = ['떡볶이', "계란말이", '라면', "부대찌개", '생선�
 var WhatToDrink = ["오렌지 주스", "물", "사이다", "콜라", "포도 주스", "코코아"]
 var WhatToDo = ["책 읽으세요", "게임 하세요", "밥 드세요", "자세요", "노세요"]
 var WhatToGame = ["마인크래프트", "닌텐도", "테트리스"]
+const DisButtton = require('discord-buttons');
 const { Client, Intents } = require('discord.js');
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+DisButtton(client);
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -30,6 +33,7 @@ client.login('ODI3NzczNDE3MDE2NTI0ODUw.YGf6EQ.aZ5ELNQt7CcId6OPlAdMH_JgoIk');
 const { deepStrictEqual } = require('assert');
 const { constants } = require('buffer');
 const Discord = require('discord.js');
+
 const path = require('path');
 const fs = require('fs');
 const mysql = require('mysql');  // mysql 모듈 로드
@@ -1677,12 +1681,11 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
   if(msg.content === "^우돌봇"){
     const embed = new Discord.MessageEmbed()
     .setAuthor("우돌봇", "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
-    .setTitle("우돌봇 프로필")
+    .setTitle("우돌봇, Udoll Bot, ウドールボット, 玩偶机器人")
     .setURL("https://www.youtube.com/channel/UC0tqXa-9l_CHd3ipnNE0jeQ")
     .setColor(0x98F791)
     .setDescription("안녕하세요 우돌봇입니다")
     .setThumbnail("https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
-    .addField("취미", "대답하기", true)
     .addField("생년월일", "2021년 4월 3일", true)
     .addField("제작자", "RainStone2#2268", true)
     .addField("^우돌봇", "우돌봇 프로필을 봅니다", true)
@@ -1709,7 +1712,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .setFooter("이스터에그를 찾는 재미도 있겠죠?","https://cdn-icons-png.flaticon.com/512/4321/4321484.png")
     .setTimestamp(new Date())
     msg.channel.send(embed)
-
   }
 
   if(msg.content == "!돈"){
@@ -2178,7 +2180,9 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         return data
       })
       WhatToEat = WhatToEat.split("/")
-      const random1 = Math.round(Math.random() * WhatToDrink.length - 1);
+      console.log(WhatToEat)
+      const random1 = Math.floor(Math.random() * WhatToEat.length);
+      console.log("NUM = "+ random1)
       msg.reply(WhatToEat[random1]);
     }
     else if(msg.content === ('뭐마시지')){
@@ -2186,23 +2190,24 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
         return data
       })
       WhatToDrink = WhatToDrink.split("/")
-      const random1 = Math.round(Math.random() * WhatToDrink.length - 1);
+      const random1 = Math.floor(Math.random() * WhatToDrink.length);
       msg.reply(WhatToDrink[random1]);
     }
     else if(msg.content === ('뭐하지')){
-      WhatToDo = fs.readFile("WhatToDo.txt", "utf8", (err, data) =>{
+      WhatToDo = fs.readFileSync("WhatToDo.txt", "utf8", (err, data) =>{
         return data
       })
       WhatToDo = WhatToDo.split("/")
-      const random1 = Math.round(Math.random() * WhatToDo.length - 1);
+      
+      const random1 = Math.floor(Math.random() * WhatToDo.length);
       msg.reply(WhatToDo[random1]);
     }
     else if(msg.content === ('무슨겜하지')){
-      WhatToGame = fs.readFile("WhatToGame.txt", "utf8", (err, data) =>{
+      WhatToGame = fs.readFileSync("WhatToGame.txt", "utf8", (err, data) =>{
         return data
       })
       WhatToGame = WhatToGame.split("/")
-      const random1 = Math.round(Math.random() * WhatToGame.length - 1);
+      const random1 = Math.floor(Math.random() * WhatToGame.length);
       msg.reply(WhatToGame[random1]);
     }
     if(msg.content === "오른쪽" || msg.content === "왼쪽"){
@@ -2492,12 +2497,14 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
           
           }
           if(msg.content == "우돌봇 집단지성"){
+            console.log(msg.author)
             const jipdanjisung = new Discord.MessageEmbed()
             .setTitle("집단지성 모음")
             .addField("뭐먹지", "무엇을 먹을까["+WhatToEat.length+"]", true)
             .addField("뭐마시지", "무엇을 마시지["+WhatToDrink.length+"]", true)
             .addField("뭐하지", "무엇을 하지["+WhatToDo.length+"]", true)
             .addField("무슨겜하지", "무슨 게임을 하지["+WhatToGame.length+"]", true)
+            .addField("봇소재", "기능 추천, 대부분 만들어 드림")
             .setFooter("명령어는 집단지성 [옵션] [값]", "https://image.winudf.com/v2/image1/Y29tLm9uZXNpaW4ubG90dG9jaV9zY3JlZW5fN18xNTkyMjU3OTYyXzA0Nw/screen-6.jpg?fakeurl=1&type=.webp")
             .setColor(0x98F791)
             msg.channel.send(jipdanjisung)
@@ -2512,6 +2519,17 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               WhatToEat = WhatToEat.split("/")
               if(WhatToEat.includes(JipValue) == false){
                 fs.appendFileSync("WhatToEat.txt", "/"+JipValue)
+                msg.channel.send("성공적으로 항목을 추가했습니다!")
+              }
+              else{
+                msg.channel.send("중복되는 항목입니다!")
+              }
+            }
+            else if(JipOption == "봇소재"){
+              BotSojae = fs.readFileSync("BotSojae.txt", "utf8", (err, data) =>{return data})
+              BotSojae = BotSojae.split("/")
+              if(BotSojae.includes(JipValue) == false){
+                fs.appendFileSync("BotSojae.txt", "/"+JipValue)
                 msg.channel.send("성공적으로 항목을 추가했습니다!")
               }
               else{
@@ -2550,13 +2568,14 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               })
               WhatToGame =WhatToGame.split("/")
               if(WhatToGame.includes(JipValue) == false){
-                fs.appendFileSync("WhatToEat.txt", "/"+JipValue, err)
+                fs.appendFileSync("WhatToGame.txt", "/"+JipValue)
                 msg.channel.send("성공적으로 항목을 추가했습니다!")
               }
               else{
                 msg.channel.send("중복되는 항목입니다!")
               }
             }
+            fs.appendFileSync("JipDanJiSung_Log.txt", JipValue+", "+msg.author.username+"@"+msg.author.discriminator+", " + new Date() +"\n")
           }
           if(msg.content === "밸게기"){
             if(answered.get(msg.author.username) === "false"){
