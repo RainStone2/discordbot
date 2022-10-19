@@ -4,7 +4,10 @@ let hp = 5000;
 let ff=[0,0]
 let t=0
 let fi=0
+
 var mana=101029381273
+const width = 2400;
+const height = 1240;
 var damage=10000
 let maxhp=5000
 var WhatToEat = ['떡볶이', "계란말이", '라면', "부대찌개", '생선구이', "소고기", '돼지고기 볶음', "치킨"]
@@ -12,8 +15,8 @@ var WhatToDrink = ["오렌지 주스", "물", "사이다", "콜라", "포도 주
 var WhatToDo = ["책 읽으세요", "게임 하세요", "밥 드세요", "자세요", "노세요"]
 var WhatToGame = ["마인크래프트", "닌텐도", "테트리스"]
 const DisButtton = require('discord-buttons');
-const { Client, Intents } = require('discord.js');
-
+const { Client, Intents, MessageAttachment } = require('discord.js');
+const { createCanvas, loadImage } = require("canvas");
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 DisButtton(client);
 client.on('ready', () => {
@@ -62,7 +65,7 @@ function getDictionary(input, callback) {
     m: 'pc', 
     hid: '162226050205664350'
   };
-
+  
   var naverDictionaryInfo = {
     hostname: 'ko.dict.naver.com',
     port: 443,
@@ -122,11 +125,13 @@ function getDictionary(input, callback) {
 
 client.on('ready', () => {
   console.log("봇 온!");
-  
 });
+const canvas = createCanvas(width, height)
+const context = canvas.getContext("2d")
 const questionmap = new Map();
 const rmap = new Map();
 const pointmap = new Map();
+const DposMap = new Map();
 const memomap = new Map();
 const ggutmalitguimap = new Map();
 const lenggutmalitguimap = new Map();
@@ -147,6 +152,7 @@ const Dexp = new Map();
 const Dhp = new Map();
 const Dmg = new Map();
 const Dmana = new Map();
+const MathIng = new Map();
 const DungeonMonHp = new Map();
 const Darmor = new Map();
 const Defense = new Map();
@@ -175,7 +181,6 @@ const Aexp = new Map();
 const DungeonClearedMap = new Map();
 const Tlevel = new Map();
 const Texp = new Map();
-
 const Shealth = new Map();
 const Sdmg = new Map();
 const Smana = new Map();
@@ -184,7 +189,6 @@ const Dinven = new Map();
 function random(small, big) {
   return Math.floor(Math.random() * (big - small)) + small;
 }
-
 function inventoryFind(num, UserInven){
   for(var index = 0; index < UserInven.length + 1; index++){
     if(UserInven[index] == num){
@@ -193,6 +197,23 @@ function inventoryFind(num, UserInven){
   }
   return "false";
 
+}
+function gamble(channel){
+  DobakPercent = Math.floor(Math.random() * 10)
+  console.log(DobakPercent)
+  if(DobakPercent < 4){
+    channel.send("성공입니다! 2배 드리겠습니다")
+    multiply = 2
+  }
+  else if(DobakPercent <= 1){
+    channel.send("대성공! 5배 드리겠습니다")
+    multiply = 5
+  }
+  else{
+    channel.send("실패... 0배로 드립니다.")
+    multiply = 0
+  }
+  return multiply
 }
 function random(small, big) {
     return Math.floor(Math.random() * (big - small)) + small;
@@ -281,25 +302,26 @@ function monster_information(num1,num2){
   
   //이름,체력,데미지,쿨타임,스테이지↓,스테이지↑,exp
   if(num1==1){
-    if(num2==1) return ["해골"  ,300 ,500 ,1,1,70]  //1
-    if(num2==2) return ["맷돼지",1000,100 ,1,2,70]  //1~2
-    if(num2==3) return ["기사"  ,700 ,300 ,1,3,70]  //1~3
-    if(num2==4) return ["고블린",100 ,500 ,2,3,50]  //2~3
-    if(num2==5) return ["트롤"  ,50  ,700 ,2,3,70]  //2~5
-    if(num2==6) return ["마녀"  ,1500,500 ,2,5,100]  //3~5
-    if(num2==7) return ["슬라임",2000,700 ,4,5,100]  //4~5
-    if(num2==8) return ["골램"  ,5000,100 ,4,5,200]  //4~5
-    if(num2==9) return ["사신"  ,500 ,3000,5,5,200]  //5
+    if(num2==1) return ["해골"  ,300 ,500 ,1,1,70, "skeleton"]  //1
+    if(num2==2) return ["맷돼지",1000,100 ,1,2,70, "mad_pig"]  //1~2
+    if(num2==3) return ["기사"  ,700 ,300 ,1,3,70, "knight"]  //1~3
+    if(num2==4) return ["고블린",100 ,500 ,2,3,50, "goblin"]  //2~3
+    if(num2==5) return ["트롤"  ,50  ,700 ,2,3,70, "troll"]  //2~5
+    if(num2==6) return ["마녀"  ,1500,500 ,2,5,100, "witch"]  //3~5
+    if(num2==7) return ["슬라임",2000,700 ,4,5,100, "slime"]  //4~5
+    if(num2==8) return ["미니 골램"  ,5000,100 ,4,5,200, "golem"]  //4~5
+    if(num2==9) return ["사신"  ,500 ,3000,5,5,200, "reaper"]  //5
   }
+  
   else{
-    if(num2==1) return ["아이스 드래곤"  ,15000 ,3000 ,6]
-    if(num2==2) return ["파이어 드래곤"  ,10000 ,5000 ,6]
-    if(num2==3) return ["레전더리 드래곤",15000 ,5000 ,6]
-    if(num2==4) return ["골램"           ,15000 ,500  ,1]
-    if(num2==5) return ["케르배우스"     ,10000 ,2000 ,2]
-    if(num2==6) return ["마왕"           ,15000 ,2000 ,3]
-    if(num2==7) return ["악마"           ,15000 ,3500 ,4]
-    if(num2==8) return ["신"             ,100000,10000,5]
+    if(num2==1) return ["아이스 드래곤"  ,15000 ,3000 ,6, "ice_drag"]
+    if(num2==2) return ["파이어 드래곤"  ,10000 ,5000 ,6, "fire_drag"]
+    if(num2==3) return ["레전더리 드래곤",15000 ,5000 ,6, "legen_drag"]
+    if(num2==4) return ["골램"           ,15000 ,500  ,1, "golem"]
+    if(num2==5) return ["케르배우스"     ,10000 ,2000 ,2, "kerbauce"]
+    if(num2==6) return ["마왕"           ,15000 ,2000 ,3, "bad_king"]
+    if(num2==7) return ["악마"           ,15000 ,3500 ,4, "devil"]
+    if(num2==8) return ["신"             ,100000,10000,5, "god"]
   }
 }
 function skillmsg(msg) {
@@ -307,7 +329,7 @@ function skillmsg(msg) {
   msgsplitt = msg.split(" ");
   pr2=[]
   msg = msgsplitt[0];
-  if (msgsplitt.length == 2 && msgsplitt[1] <= 5 && msgsplitt[1] >= 1){     //skill을 보냈는지 확인하는 함수임
+  if (msgsplitt.length == 2 && msgsplitt[1] <= 5 && msgsplitt[1] >= 1){//skill을 보냈는지 확인하는 함수임
     console.log("IF문에 들어옴")
     for (qq1 = 1; qq1 < 5; qq1++) {
     for (qq2 = 1; qq2 < 5; qq2++) {
@@ -316,7 +338,7 @@ function skillmsg(msg) {
         k = 1;
         pr2 = [msgsplit[1]];
         for (qq3 = 0; qq3 < skill(qq1, qq2).length; qq3++) {
-          pr2[qq3 + 1] = skill(qq1, qq2)[qq3  ];
+          pr2[qq3 + 1] = skill(qq1, qq2)[qq3];
         }
         //pr2=[msgsplit[1],skill(qq1,qq2)]
         return pr2;
@@ -332,6 +354,20 @@ k=1
 return pr2;
 */
 }
+function numtoEngname(a){
+  al=a.length
+  b=[]
+  b[0]=""
+    c=monster_information(1,a[0])
+    b[0]=c[6]
+  for(p=1;p<al;p++){
+    c=monster_information(1,a[p])
+    b[p]=c[6]
+  }
+  console.log("c" + c)
+  console.log(b)
+  return b
+}
 function numtoname(a){
   al=a.length
   b=[]
@@ -341,7 +377,7 @@ function numtoname(a){
   for(p=1;p<al;p++){
     b[p]=""
     c=monster_information(1,a[p])
-    b[p]=c[0]
+    b[p]=c[0]   
   }
   
   return b
@@ -358,9 +394,6 @@ function RunSqlWithFunction(testQuery, fnct) {
   connection.query(testQuery, fnct)
   
   };
-function RunSqlWithParam(testQuery, fnct, value){
-  connection.query(testQuery, fnct)
-}
 function inventorynum(num){
 //이름,종류,가격,팔는거/사는거,만들수 있냐 없냐
 if(num==1){
@@ -583,13 +616,20 @@ function maprandom(stage, Author){
     mon[0]=mm
     monhp[0]=numtohp(mm)
   for(k=0;k<50;k++){
+    
     r=random(1,9)
     d=0
+
     if(r<3){
+      //앞으로 가기
+      if(now[0]!=0){
       d=1
       now[0]-=1
-    }else if(r<6){
-      
+      }
+    }
+    
+    else if(r<6){
+      //오른쪽으로 가기
       if(now[1]!=4){
         now[1]+=1
         a=0
@@ -614,7 +654,10 @@ function maprandom(stage, Author){
         now[1]-=1
       }
       */
-    }else{
+    }
+    
+    else{
+      //왼쪽으로 가기
       if(now[1]!=0){
         now[1]-=1
         a=0
@@ -645,6 +688,7 @@ function maprandom(stage, Author){
       //  
       //}
       //else{
+      
     mm=mapmonstar(stage);
     //mon[mon.length]=[]
     mon[mon.length]=mm;
@@ -668,12 +712,13 @@ function maprandom(stage, Author){
     }
   }
   */
+  DposMap.set(Author, pos)
   DungeonMonHp.set(Author, monhp)
   Dungeonmap.set(Author, map)
   DungeonMonster.set(Author, mon)
+  console.log("DungeonMonster.set(Author, ", DungeonMonster.get(Author), ")")
   return map
 }
- 
 function mappr(map,pos, Author){
   mpr=""
   ml=map.length
@@ -738,29 +783,29 @@ function move_show(msg,map,pos, Author){
     if(sm[1]==1){
     if(sm[6]<mana){
       mana-=sm[6]
-    opi = sm[5] + 1;
+    opi = sm[5];
     mmm = sm[0];
     nth = numtohp(mon[mmm]);
     o = numtoname(mon[mmm]);
     dz = oo;
     if (monhp[mmm][oo] > 0) {
       cdamage = Dmg.get(Author) * sm[4];
-      monhp[mmm][oo] -= cdamage;
+      monhp[mmm][oo] -= cdamage * opi;
       pr = [];
       zz = 1;
       hp -= monster_information(1, mon[mmm][oo])[2];
       prr = [];
-      for (ii = 0; ii < opi-1; ii++) {
+      
         if (monhp[mmm][oo] <= 0) {
           monhp[mmm][oo] -= cdamage;
-          prr[ii] = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2)) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
+          prr = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2)) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
         } else {
           monhp[mmm][oo] -= cdamage;
-          prr[ii] = o[oo] + "을 때렸습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2));
+          prr = o[oo] + "을 "+ opi +"번 때렸습니다!\n  >데미지:" + cdamage * opi + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2));
         }
-      }
-      if (hp <= 0) prr[ii] = o[oo] + "가 당신을 죽였습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
-      else prr[ii] = o[oo] + "가 당신을 때렸습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
+      
+      if (hp <= 0) prr += "\n" + o[oo] + "가 당신을 죽였습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
+      else prr += "\n" + o[oo] + "가 당신을 때렸습니다!\n  >데미지:" + monster_information(1, mon[mmm][oo])[2] + "\n  >체력:" + percentage((hp / maxhp * 100).toFixed(2));
       return prr;
     } else {
       at = 1;
@@ -823,7 +868,7 @@ function move_show(msg,map,pos, Author){
   }
   if (msg=="hp") return hp
   
-  if(msgsplit.length==2 && msgsplit[0]=="atk" && msgsplit[1]<6 && msgsplit[1]>0 || skill(Djob.get(Author),msgsplit[0]) != undefined){
+  if(msgsplit.length==2 && msgsplit[0]=="atk" && msgsplit[1]<6 && msgsplit[1] > 0 || skill(Djob.get(Author),msgsplit[0]) != undefined){
     if(!fi || oo==dz){
     for(m=0;m<ml;m++){
         if(map[m][0]==pos[0] && map[m][1]==pos[1]){
@@ -960,16 +1005,42 @@ function move_show(msg,map,pos, Author){
     
     ntn=numtoname(monster[mmm])
     nth=numtohp(monster[mmm])
+    var canvas = createCanvas(width, height)
+    var context = canvas.getContext("2d")
+    
+    context.fillStyle = "white"
+    ntEngn = numtoEngname(monster[mmm])
+    context.fillRect(0, 0, width, height)
+    console.log(ntEngn)
     pr="   ["+(mmm+1)+"번 방의 정보]\n\n----------------------------\n    몬스터\n"
     for(p=0;p<5;p++){
-      //return monhp[mmm][p]+"\n"+nth[p]
       pr+="\n  "+(p+1)+"> "+ntn[p]
       if(ntn[p].length==2) pr+="    "
       if(monhp[mmm][p]>0) pr+=percentage(monhp[mmm][p]/nth[p]*100)
       else pr+="죽음"
-      
     }
-    
+    loadImage("./background.png").then((img) => {
+      context.drawImage(img, 0, 0, width, height)
+      console.log("./"+ntEngn[0]+".png")
+      loadImage("./" + ntEngn[0] + ".png").then((imag) => {
+        context.drawImage(imag, 300*1, 200, 300, 300)
+        })
+      loadImage("./" + ntEngn[1] + ".png").then((imag) => {
+        context.drawImage(imag, 300*2, 200, 300, 300)
+          })
+      loadImage("./" + ntEngn[2] + ".png").then((imag) => {
+        context.drawImage(imag, 300*3, 200, 300, 300)
+          })
+      loadImage("./" + ntEngn[3] + ".png").then((imag) => {
+        context.drawImage(imag, 300*4, 200, 300, 300)
+          })
+      loadImage("./" + ntEngn[4] + ".png").then((imag) => {
+        context.drawImage(imag, 300*5, 200, 300, 300)
+        const buffer = canvas.toBuffer("image/png")
+        fs.writeFileSync("./image.png", buffer)
+          })
+        //return monhp[mmm][p]+"\n"+nth[p]
+  })
     
     pr+="\n\n----------------------------\n        장소\n"
     
@@ -1018,8 +1089,6 @@ function move_show(msg,map,pos, Author){
     }
     if(a) pr+="오른쪽> "+mmm+"번방"
     else  pr+="오른쪽> X"
-    
-    
     return pr
   }
   else{
@@ -1037,7 +1106,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[0]--
-      return ("앞으로 갔습니다\n"+mappr(map, pos, Author))
+      return ("앞으로 갔습니다\n"+mappr(Dungeonmap.get(Author), pos, Author))
     }
     else{
       return ("앞에 아무것도 없습니다")
@@ -1054,7 +1123,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[1]--
-      return ("왼쪽으로 갔습니다\n"+mappr(map, pos, Author))
+      return ("왼쪽으로 갔습니다\n"+mappr(Dungeonmap.get(Author), pos, Author))
     }
     else{
       return ("왼쪽에 아무것도 없습니다")
@@ -1071,7 +1140,7 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[0]++
-      return ("아래로 갔습니다\n"+mappr(map, pos, Author))
+      return ("아래로 갔습니다\n"+mappr(Dungeonmap.get(Author), pos, Author))
     }
     else{
       return ("아래에 아무것도 없습니다")
@@ -1088,14 +1157,14 @@ function move_show(msg,map,pos, Author){
     }
     if(a){
       pos[1]++
-      return ("오른쪽으로 갔습니다\n"+mappr(map, pos, Author))
+      return ("오른쪽으로 갔습니다\n"+mappr(Dungeonmap.get(Author), pos, Author))
     }
     else{
       return ("오른쪽에 아무것도 없습니다")
     }
   }
   return 0
- }
+}
 function mapinformation(){
   j=0
   for(i=0;i<100;i++){
@@ -1321,7 +1390,7 @@ function levelexp(lev){
 }
 
   client.on('message', msg => {
-    
+    fs.appendFileSync("RainBot_Log.txt","\n"+ msg.author.username + " " + msg.author.id+" "+msg.content)
   if(accountCreated.get(msg.author) != true){
     moneymap.set(msg.author, 0)
     percentmap.set(msg.author, 1)
@@ -1529,12 +1598,10 @@ function levelexp(lev){
       msg.channel.send(inventorynum(Dinven.get(msg.author)[content])[0] + "를 팔았습니다! \n" + inventorynum(content)[2] + "원을 벌었습니다!")
       inventory[content] = 0
     }}
-    mm = move_show(msg.content,map,pos, msg.author);
+    mm = move_show(msg.content,Dungeonmap.get(msg.author),DposMap.get(msg.author), msg.author);
   if (mm != 0) {
     if(at==0){
-    for (i = 0; i < opi; i++) {
-      msg.channel.send(mm[i]);
-    }
+      msg.channel.send(mm);
     }
     else msg.channel.send(mm)
   }
@@ -1546,10 +1613,11 @@ function levelexp(lev){
     
     if(msg.content == ".d mi" || msg.content == ".d ms" || msg.content == ".d mp" ){
     if(Dungeonmap.get(msg.author) != undefined){
-    mm=move_show(msgSub,map,pos, msg.author)
+    mm=move_show(msgSub,Dungeonmap.get(msg.author),DposMap.get(msg.author), msg.author)
 
       if(mm!=0){
-        msg.channel.send(mm + "\n선택하세요 w/a/s/d")
+        const image = new MessageAttachment("./image.png")
+        msg.channel.send(mm + "\n선택하세요 w/a/s/d", {files : [image]})
       }
     }}
     else{
@@ -1590,12 +1658,12 @@ function levelexp(lev){
     msg.channel.send(help)
   }
   if(msg.content.startsWith("atk ")){
-    mm = move_show(msg.content, map, pos, msg.author)
+    mm = move_show(msg.content, Dungeonmap.get(msg.author), DposMap.get(msg.author), msg.author)
     msg.channel.send(mm)
   }
   if(msg.content == "hp"){
   
-    mm=move_show(msg.content,map,pos, msg.author)
+    mm=move_show(msg.content,Dungeonmap.get(msg.author),DposMap.get(msg.author), msg.author)
   if(mm!=0){
     if(opi!=2){
       msg.channel.send(mm)
@@ -1666,10 +1734,10 @@ function levelexp(lev){
       human === "보"? (winner = bot === "가위" ? "봇" : "인간") : "";
     }
     const result = 
-`
-사람 : ${human} vs 봇 : ${bot}
-${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
-`
+    `
+    사람 : ${human} vs 봇 : ${bot}
+    ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
+    `
     msg.reply(result);
     
   
@@ -1706,7 +1774,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     .addField("<>{끝말잇기를 진행할 단어}", "끝말잇기를 할 수 있습니다.", true)
     .addField("끝말잇기 리셋 {단어}", "끝말잇기 리셋을 합니다.", true)
     .addField("밸게 ㄱ", "밸런스 게임을 합니다", true)
-    .addField("파이 = ??", "파이값 을 보여 줍니다.",true)
+    .addField("파이", "파이값 을 보여 줍니다.",true)
     .addField("!돈", "돈 관련 게임의 도움말을 보여 줍니다.", true)
     .addField(".d h", "던전 도움말을 봅니다.", true)
     .setFooter("이스터에그를 찾는 재미도 있겠죠?","https://cdn-icons-png.flaticon.com/512/4321/4321484.png")
@@ -1910,10 +1978,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
   a=ad.split(" ")
   if(a[0]==".d" && a[1]=="ii"){
     msg.channel.send(inventoryinformation(a[2]))
-  }
-    
-  if(msg.content == "연결 끊기"){
-    connection.end()
   }
   if(msg.content == ".d s1"){
     var stat = Dstat.get(msg.author);
@@ -2138,7 +2202,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     damg = Dmg.get(msg.author)
     mana = Dmana.get(msg.author)
     Dmana.set(msg.author, mana*2)
-    Djob.set(msg.author, 3)
+    Djob.set(msg.author, 4)
   }
   else if(msg.content == ".d ca"){
     msg.channel.send("직업을 아처로 바꿨습니다.")
@@ -2146,14 +2210,14 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
     damg = Dmg.get(msg.author)
     Dhp.set(msg.author, hp*0.7)
     Dmg.set(msg.author, damg*1.7)
-    Djob.set(msg.author, 4)
+    Djob.set(msg.author, 5)
   }
   else if(msg.content == ".d ct"){
     msg.channel.send("직업을 탱커로 바꿨습니다.")
     hp = Dhp.get(msg.author)
     damg = Dmg.get(msg.author)
     Dhp.set(msg.author, hp*2)
-    Djob.set(msg.author, 5)
+    Djob.set(msg.author, 3)
   }
   /*
   if(msg.content == ".d sd"){
@@ -2163,12 +2227,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
   if (msg.content === '제작자') {
     msg.reply('https://discord.gg/pcsMCJBj3S에서 제작자를 만나보세요!');
   }
-  if(msg.content.startsWith("랜덤")){
-    const random = Math.floor(Math.random() * 2);
-    List = ["턴제", "쿨타임"]
-    msg.channel.send(List[random])
-  }
-    
     if(msg.content.startsWith('-shout')){
       const strShout = msg.content.substring(6);
       msg.channel.send(strShout)
@@ -2411,7 +2469,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               msg.channel.bulkDelete(1)
               msg.channel.send("글자 수가 2글자 이상이 되게 또는 첫 글자가 전 단어의 제일 뒷 자리의 글자와 같게 해 주세요!")
             }}}
-            if(msg.content === "파이 = ??"){
+            if(msg.content === "파이"){
               msg.channel.send("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 70679 82148 08651 32823 06647 09384 46095 50582 23172 53594 08128 48111 74502 84102 70193 85211 05559 64462 29489 54930 38196 44288 10975 66593 34461 28475 64823 37867 83165 27120 19091 45648 56692 34603 48610 45432 66482 13393 60726 02491 41273 72458 70066 06315 58817 48815 20920 96282 92540 91715 36436 78925 90360 01133 05305 48820 46652 13841 46951 94151 16094 33057 27036 57595 91953 09218 61173 81932 61179 31051 18548 07446 23799 62749 56735 18857 52724 89122 79381 83011 94912 98336 73362 44065 66430 86021 39494 63952 24737 19070 21798 60943 70277 05392 17176 29317 67523 84674 81846 76694 05132 00056 81271 45263 56082 77857 71342 75778 96091 73637 17872 14684 40901 22495 34301 46549 58537 10507 92279 68925 89235 42019 95611 21290 21960 86403 44181 59813 62977 47713 09960 51870 72113 49999 99837 29780 49951 05973 17328 16096 31859 50244 59455 34690 83026 42522 30825 33446 85035 26193 11881 71010 00313 78387 52886 58753 32083 81420 61717 76691 47303 59825 34904 28755 46873 11595 62863 88235 37875 93751 95778 18577 80532 17122 68066 13001 92787 66111 95909 21642 01989 38095 25720 10654 85863 27886 59361 53381 82796 82303 01952 03530 18529 68995 77362 25994 13891 24972 17752 83479 13151 55748 57242 45415 06959 50829 53311 68617 27855 88907 50983 81754 63746 49393 19255 06040 09277 01671 13900 98488 24012 85836 16035 63707 66010 47101 81942 95559 61989 46767 83744 94482 55379 77472 68471 04047 53464 62080 46684 25906 94912 93313 67702 89891 52104 75216 20569 66024 05803 81501 93511 25338 24300 35587 64024 74964 73263 91419 92726 04269 92279 67823 54781 63600 93417 21641 21992 45863 15030 28618 29745 55706 74983 85054 94588 58692 69956 90927 21079 75093 02955 32116 53449 87202 75596 02364 80665 49911 98818 34797 75356 63698 07426 54252 78625 51818 41757 46728 90977 77279 38000 81647 06001 61452 49192 17321 72147 72350")
             }
             if(msg.content.startsWith("끝말잇기 리셋 ")){
@@ -2531,6 +2589,7 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               if(BotSojae.includes(JipValue) == false){
                 fs.appendFileSync("BotSojae.txt", "/"+JipValue)
                 msg.channel.send("성공적으로 항목을 추가했습니다!")
+
               }
               else{
                 msg.channel.send("중복되는 항목입니다!")
@@ -2587,7 +2646,6 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
               const moonjae = "바로 전 문제는 " + randombalancegamelist[moonjaemap.get(msg.author.username)] + " 이었습니다."
               const resultt = "당신의 대답은 [" + answermap.get(msg.author.username) + "]"
               const balanceembed = new Discord.MessageEmbed()
-            
                 .setAuthor(msg.author.username, "https://lh3.googleusercontent.com/a-/AOh14Gi6sB8832CeJJJNfQiG0vwDfsdmYjr32UICPtZx=s600-k-no-rp-mo")
                 .setTitle(moonjae)
                 .addField(resultt, "을(를) 골랐습니다!")
@@ -2595,7 +2653,110 @@ ${winner === "비김" ? "우리는 비겼다 휴먼" : winner + "의 승리다"}
                 .setColor(0x98F791)
               msg.channel.send(balanceembed)
             }
-            
+          }
+          if(msg.content == "우돌봇 수학"){
+            const MathEmbed = new Discord.MessageEmbed()
+            .setTitle("우돌봇 수학")
+            .setDescription("우돌봇의 수학 관련 명령어입니다.")
+            .addField("우돌봇 부채꼴", "부채꼴 넓이를 구합니다.")
+            msg.channel.send(MathEmbed)
+          }
+          if(msg.content == "우돌봇 부채꼴"){
+            msg.channel.send("반지름을 '부채꼴' 과 함께 입력해 주세요")
+            msg.channel.send("예) 부채꼴 5")
+            MathIng.set(msg.author, true)
+          }
+          if(MathIng.get(msg.author) == true && msg.content.startsWith("부채꼴")){
+            var r = msg.content.split(" ")[1]
+            msg.channel.send("부채꼴의 둘레 : "+2 * r + "ㅠ")
+            msg.channel.send("부채꼴의 넓이 : " + r * r + "ㅠ")
+            MathIng.set(msg.author, false)
+          }
+          if(msg.content == "우돌봇 비상금"){
+            dobak = fs.readFileSync("Dobak.txt", "utf8", (err, data) =>{return data})
+            dobak = dobak.split(" ")
+            for(var i = 0;i< dobak.length;i++){
+              if(dobak[i].includes(msg.author.id)){
+                DobakMoney = dobak[i]
+                DobakMoney = DobakMoney.split("/")[1]
+                
+                DobakIndex = i
+                break
+              }
+            }
+            if(Number(DobakMoney) == 0){
+              msg.channel.send("비상금 5000원을 드릴게요!")
+              Number(DobakMoney) += 5000
+              delete dobak[i]
+              dobak.push(" "+msg.author.id + "/" +DobakMoney)
+              dobak = dobak.join(' ')
+              console.log(dobak)
+              fs.writeFileSync("Dobak.txt", dobak)
+            }
+            else{
+              msg.channel.send("돈도 많으면서.. 안드려요!")
+            }
+          }
+          if(msg.content == "우돌봇 도박"){
+              dobak = fs.readFileSync("Dobak.txt", "utf8", (err, data) =>{return data})
+              if(dobak.includes(msg.author.id)){
+                dobak = dobak.split(" ")
+                for(var i = 0;i< dobak.length;i++){
+                  if(dobak[i].includes(msg.author.id)){
+                    DobakMoney = dobak[i]
+                    DobakMoney = DobakMoney.split("/")[1]
+                    
+                    DobakIndex = i
+                    break
+                  }
+                }
+              DobakEmbed = new Discord.MessageEmbed()
+              .setTitle("우돌봇 도박 명령어입니다.")
+              .setDescription("현재 가지고 있는 돈 : " + DobakMoney)
+              .addField("우돌봇 도박 반", "돈의 반을 겁니다")
+              .addField("우돌봇 도박 올인", "돈을 다 겁니다")
+              msg.channel.send(DobakEmbed)
+            }
+            else{
+              fs.appendFileSync("Dobak.txt", " " + msg.author.id + "/" + "100000")
+              msg.channel.send("10만원과 함께 회원가입 되셨습니다")
+            }
+          }
+          if(msg.content == "우돌봇 도박 올인"){
+            DobakUserList = fs.readFileSync("Dobak.txt", "utf8", (err, data) =>{return data})
+            DobakUserList = DobakUserList.split(" ")
+            for(var i = 0;i< DobakUserList.length;i++){
+              if(DobakUserList[i].includes(msg.author.id)){
+                DobakMoney = DobakUserList[i]
+                DobakMoney = DobakMoney.split("/")[1]
+                DobakIndex = i
+                break
+              }
+            }
+            DobakMoney = Number(DobakMoney) * gamble(msg.channel)
+            delete DobakUserList[i]
+            DobakUserList.push(" "+msg.author.id + "/" +DobakMoney)
+            DobakUserList = DobakUserList.join(' ')
+            console.log(DobakUserList)
+            fs.writeFileSync("Dobak.txt", DobakUserList)
+          }
+          if(msg.content == "우돌봇 도박 반"){
+            DobakUserList = fs.readFileSync("Dobak.txt", "utf8", (err, data) =>{return data})
+            DobakUserList = DobakUserList.split(" ")
+            for(var i = 0;i< DobakUserList.length;i++){
+              if(DobakUserList[i].includes(msg.author.id)){
+                DobakMoney = DobakUserList[i]
+                DobakMoney = DobakMoney.split("/")[1]
+                DobakIndex = i
+                break
+              }
+            }
+            DobakMoney = Number(DobakMoney / 2) + Number(DobakMoney / 2) * gamble(msg.channel)
+            delete DobakUserList[i]
+            DobakUserList.push(" "+msg.author.id + "/" +DobakMoney)
+            DobakUserList = DobakUserList.join(' ')
+            console.log(DobakUserList)
+            fs.writeFileSync("Dobak.txt", DobakUserList)
           }
           const packageJSON = require("./package.json");
       }
