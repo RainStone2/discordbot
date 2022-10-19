@@ -1138,6 +1138,7 @@ function move_show(msg,map,pos, Author){
         mmm=m
       }
     }
+    
     if(a){
       pos[0]++
       return ("아래로 갔습니다\n"+mappr(Dungeonmap.get(Author), pos, Author))

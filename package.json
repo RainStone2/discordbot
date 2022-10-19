@@ -9,7 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/opus": "github:discordjs/opus",
+    "canvas": "^2.10.1",
     "discord-buttons": "^4.0.0-deprecated",
+    "ffmpeg": "0.0.4",
+    "mysql": "^2.18.1",
     "weather.js": "^0.1.0"
   }
 }
