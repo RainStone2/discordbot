@@ -1,1 +1,6 @@
-readme
+if(user.getQuestion == "온라인인가"){
+  console.log("오프라인입니다")
+}
+else{
+  console.log("몰라요")
+}
