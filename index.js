@@ -4,7 +4,7 @@ let hp = 5000;
 let ff=[0,0]
 let t=0
 let fi=0
-
+let k = 0
 var mana=101029381273
 const width = 2400;
 const height = 1240;
@@ -145,7 +145,6 @@ const dungeonCreated = new Map();
 const percentmap = new Map();
 const earningmap = new Map();
 const Dplayer = new Map();
-const Dmoney = new Map();
 const Djob = new Map();
 const Dlevel = new Map();
 const Dexp = new Map();
@@ -286,7 +285,9 @@ function skill(job, num) {
     if (num == 5) 
       return [4, "힐샷", 25, 3000, 100, 3, 1];
   }
-
+  else{
+    return undefined;
+  }
 }
 /*
 function skillmsg(msg, Author) {
@@ -1403,7 +1404,7 @@ function levelexp(lev){
     Dexp.set(msg.author, 0);
     Djob.set(msg.author, 1);
     Dlevel.set(msg.author, 4);
-    Dmoney.set(msg.author, 10000);
+    
     Dhp.set(msg.author, 1000);
     Dmg.set(msg.author, 200);
     Dmana.set(msg.author, 100);
@@ -1594,8 +1595,8 @@ function levelexp(lev){
     if(Dinven.get(msg.author)[content] != 0 && typeof(Dinven.get(msg.author)[content]) != "undefined"){
       var inventory = Dinven.get(msg.author)
       Dinven.set(msg.author, inventory)
-      var money = Dmoney.get(msg.author)
-      Dmoney.set(msg.author, money + (inventorynum(content))[2])
+      var money = moneymap.get(msg.author)
+      moneymap.set(msg.author, money + (inventorynum(content))[2])
       msg.channel.send(inventorynum(Dinven.get(msg.author)[content])[0] + "를 팔았습니다! \n" + inventorynum(content)[2] + "원을 벌었습니다!")
       inventory[content] = 0
     }}
@@ -1851,7 +1852,7 @@ function levelexp(lev){
         var money
                 
         RunSqlWithFunction('select `money` from `member` where id = "' + String(msg.author.id) + '"and `money` >= `earning` * 1000 order by `money` desc limit 1', 
-        function(err, results, fields) {er
+        function(err, results, fields) {
           console.log(results[0].money)
 
           if(Number(results[0].money) > 0){
@@ -1945,7 +1946,7 @@ function levelexp(lev){
     .addField("현재 직업", job)
     .addField("레벨", Dlevel.get(msg.author), true)
     .addField("체력", Dhp.get(msg.author), true)
-    .addField("돈", Dmoney.get(msg.author), true)
+    .addField("돈", moneymap.get(msg.author), true)
     .addField("데미지", Dmg.get(msg.author), true)
     .addField("마나", Dmana.get(msg.author), true)
     .addField("방어력", ArmDef.get(msg.author) + Defense.get(msg.author), true)
@@ -2099,9 +2100,9 @@ function levelexp(lev){
         
         RunSqlWithFunction('Select `inventory`, `inventCount` from `member` where id = '+msg.author.id+" order by `inventory` desc, `inventCount` desc",
         function(err, result, field){
-        var Currentmoney = Dmoney.get(msg.author)
+        var Currentmoney = moneymap.get(msg.author)
     if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
-        Dmoney.set(msg.author, Currentmoney - inventorymaterial(marketmsg[2])[0])
+        moneymap.set(msg.author, Currentmoney - inventorymaterial(marketmsg[2])[0])
         
         if(inventoryFind(marketmsg[2], inventory) == "false"){
         DinvenIndex = inventory.indexOf(0)
@@ -2130,7 +2131,7 @@ function levelexp(lev){
     inven += "'" 
     console.log("invenC : "+invenC)
     RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
-    msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
+    msg.channel.send(inventorynum(marketmsg[2])[0] + "를 만들었습니다! " + moneymap.get(msg.author) + "원 남았습니다!")
     }
     else{
       msg.channel.send("돈이 부족합니다.")
@@ -2147,9 +2148,9 @@ function levelexp(lev){
     RunSqlWithFunction('Select inventory, inventCount from member where id = '+msg.author.id,function(err, result, field){
       invento = result[0].inventory
       invenCo = result[0].inventCount
-      var Currentmoney = Dmoney.get(msg.author)
+      var Currentmoney = moneymap.get(msg.author)
     if(Currentmoney - inventorynum(marketmsg[2])[2] >= 0){
-    Dmoney.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
+    moneymap.set(msg.author, Currentmoney - inventorynum(marketmsg[2])[2])
     var inventory = result[0].inventory
       if(inventoryFind(marketmsg[2], inventory) == "false"){
       DinvenIndex = inventory.indexOf(0)
@@ -2172,7 +2173,7 @@ function levelexp(lev){
       inven += "'" 
       console.log("invenC : "+invenC)
       RunSqlWithFunction("Update `member` set `inventCount` = " + invenC+ ", inventory = "+ inven +" where id = "+msg.author.id, function(err, result, fields){})
-      msg.channel.send(inventorynum(marketmsg[2])[0] + "를 샀습니다! " + Dmoney.get(msg.author) + "원 남았습니다!")
+      msg.channel.send(inventorynum(marketmsg[2])[0] + "를 샀습니다! " + moneymap.get(msg.author) + "원 남았습니다!")
     }
     else{
       msg.channel.send("돈이 부족합니다.")
