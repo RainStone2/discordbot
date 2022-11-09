@@ -2763,4 +2763,5 @@ function levelexp(lev){
           const packageJSON = require("./package.json");
       }
     )
-client.login('ODI3NzczNDE3MDE2NTI0ODUw.GibEMC.qcaTFFZAKuwP68uGt416iV1mhUdFAWH4ipltiQ');
+client.login('token');
+//가져가지 마세요 ( 할거면 디스코드 RainStone2#2268로 DM 주세요 )
