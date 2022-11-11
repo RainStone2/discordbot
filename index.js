@@ -5,6 +5,7 @@ let ff=[0,0]
 let t=0
 let fi=0
 let k = 0
+let token = 'ODI3NzczNDE3MDE2NTI0ODUw.G4v4W3.8Nq5OxoTRYo1G2goooQbdaFvkkrJrSbg9zcQqY'
 var mana=101029381273
 const width = 2400;
 const height = 1240;
@@ -2789,4 +2790,4 @@ function levelexp(lev){
           const packageJSON = require("./package.json");
       }
     )
-client.login('ODI3NzczNDE3MDE2NTI0ODUw.G4v4W3.8Nq5OxoTRYo1G2goooQbdaFvkkrJrSbg9zcQqY');
+client.login(token);
