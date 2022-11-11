@@ -5,7 +5,7 @@ let ff=[0,0]
 let t=0
 let fi=0
 let k = 0
-let token = 'ODI3NzczNDE3MDE2NTI0ODUw.G4v4W3.8Nq5OxoTRYo1G2goooQbdaFvkkrJrSbg9zcQqY'
+let token = ''
 var mana=101029381273
 const width = 2400;
 const height = 1240;
@@ -782,8 +782,8 @@ function move_show(msg,map,pos, Author){
   if (k == 1) {
     
     at=0
-    if(sm[1]==1){
-    if(sm[6]<mana){
+    if(sm[1]==1){ //만약 스킬이라면
+    if(sm[6]<mana){ //만약 요구마나보다 높다면
       mana-=sm[6]
     opi = sm[5];
     mmm = sm[0];
@@ -806,6 +806,8 @@ function move_show(msg,map,pos, Author){
     monhp = DungeonMonHp.get(Author)
         if (monhp[mmm][oo] <= 0) {
           monhp[mmm][oo] -= cdamage;
+          console.log(`o = ${o}`)
+          console.log(mon[mmm])
           prr = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2)) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
         } else {
           monhp[mmm][oo] -= cdamage;
