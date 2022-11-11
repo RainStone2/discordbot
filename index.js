@@ -907,7 +907,7 @@ function move_show(msg,map,pos, Author){
       }
       else{
         monhp[mmm][oo] -= cdamage
-      }
+      } 
       //oo+=1;
       pr=[]
       zz=1
