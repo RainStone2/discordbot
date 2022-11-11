@@ -1,6 +1,3 @@
-if(user.getQuestion == "온라인인가"){
-  console.log("오프라인입니다")
-}
-else{
-  console.log("몰라요")
-}
+코드 쓰지 마세요
+( 코딩 대회 제출용임 )
+쓸거면 디스코드 RainStone2#2268로 Dm
