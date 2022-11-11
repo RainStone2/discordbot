@@ -794,9 +794,15 @@ function move_show(msg,map,pos, Author){
       monhp[mmm][oo] -= cdamage * opi;
       pr = [];
       zz = 1;
+      mmm = sm[0];
       hp -= monster_information(1, mon[mmm][oo])[2];
       prr = [];
+      mon = DungeonMonster.get(Author)
       
+      o = numtoname(mon[mmm]);
+      oo=msgsplit[1]-1
+      monster = DungeonMonster.get(Author)
+    monhp = DungeonMonHp.get(Author)
         if (monhp[mmm][oo] <= 0) {
           monhp[mmm][oo] -= cdamage;
           prr = o[oo] + "를 죽였습니다!\n  >데미지:" + cdamage + "\n  >체력:" + percentage((monhp[mmm][oo] / nth[oo] * 100).toFixed(2)) + "\n  >exp:" + monster_information(1, mon[mmm][oo])[5];
@@ -882,6 +888,7 @@ function move_show(msg,map,pos, Author){
     cdamage = Dmg.get(Author)
     monster = DungeonMonster.get(Author)
     monhp = DungeonMonHp.get(Author)
+    if(msgsplit[0] == "atk") Skilldamage = Dmg.get(Author)
     if(skill(Djob.get(Author), msgsplit[0]) != undefined){
       Dskill = skill(Djob.get(Author),msgsplit[0])
       Skilldamage = Dmg.get(Author) + (STdmg.get(Author)*100) * Dskill[3]
@@ -901,11 +908,13 @@ function move_show(msg,map,pos, Author){
       else{
         monhp[mmm][oo] -= cdamage
       }
+      //oo+=1;
       pr=[]
       zz=1
       prr=[]
       if(monhp[mmm][oo]<=0){
         fi=false
+        o = numtoname(mon[mmm]);
         monhp[mmm][oo] = 0
         prr[0]=o[oo]+"를 죽였습니다!\n  >데미지:"+cdamage+"\n  >체력:"+percentage((0).toFixed(2))+"\n  >exp:"+monster_information(1,mon[mmm][oo])[5]
         console.log(monhp)
@@ -962,19 +971,36 @@ function move_show(msg,map,pos, Author){
         }
         
         }
-      else{  prr[0]=o[oo]+"을 때렸습니다!\n  >데미지:"+cdamage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))
-
+      else{
+        
+        console.log("이거임")
+        oo-=2;
+        o = numtoname(mon[mmm]);
+        oo += 2
+        console.log(`monhp[mmm][oo] : ${monhp[mmm][oo]}`)
+        monhp[mmm][oo] -= cdamage
+        console.log(`cdamage : ${cdamage}`)
+        console.log(`monhp[mmm][oo] : ${monhp[mmm][oo]}`)
+        prr[0]=o[oo]+"을 때렸습니다!\n  >데미지:"+cdamage+"\n  >체력:"+percentage((monhp[mmm][oo]/nth[oo]*100).toFixed(2))
     }
-    hp-=monster_information(1,mon[mmm][oo])[2]
+    o = numtoname(mon[mmm]);
+    console.log(mmm)
+    console.log(mon)
+    console.log(`oo : ${oo}`)
+    console.log(mon[mmm])
+    console.log("매야ㅙㅑㅁㅈ애ㅑ",mon[mmm][oo])
+    hp -= monster_information(1,mon[mmm][oo])[2]
       if(hp<=0){  
         hp = 0
+        console.log("이거임")
         prr[1]= o[oo]+"(이)가 당신을 죽였습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage(((hp/maxhp)*100).toFixed(2))
         Dhp.set(Author, hp)
     }
-            else { prr[1]= o[oo]+"(이)가 당신을 때렸습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage(((hp/maxhp)*100).toFixed(2))
-            Dhp.set(Author, hp)  
-          }
-            //}
+      else { prr[1]= o[oo]+"(이)가 당신을 때렸습니다!\n  >데미지:"+(monster_information(1,mon[mmm][oo])[2])+"\n  >체력:"+percentage(((hp/maxhp)*100).toFixed(2))
+        Dhp.set(Author, hp)  
+    }
+    console.log(prr)
+    //}
     //else{
     //  return "이미 죽어있는 몬스터 입니다"
     //}
@@ -2763,4 +2789,4 @@ function levelexp(lev){
           const packageJSON = require("./package.json");
       }
     )
-client.login('ODI3NzczNDE3MDE2NTI0ODUw.GibEMC.qcaTFFZAKuwP68uGt416iV1mhUdFAWH4ipltiQ');
+client.login('ODI3NzczNDE3MDE2NTI0ODUw.G4v4W3.8Nq5OxoTRYo1G2goooQbdaFvkkrJrSbg9zcQqY');
